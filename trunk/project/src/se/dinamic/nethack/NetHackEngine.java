@@ -21,6 +21,10 @@ public class NetHackEngine extends LibNetHack
    /** 
     *   Implementations of libnethack abstract functions
     */
+    public void onInitWindows() {
+        // Let do the splash screen....
+    }
+    
     public void onRawPrint(String status) {
        // This should probable been overlayed on ui as a log...
         Toast toast = Toast.makeText(_context, status, Toast.LENGTH_LONG);
