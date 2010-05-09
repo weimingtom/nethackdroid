@@ -6,18 +6,26 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import android.opengl.GLSurfaceView;
+
 
 public class NetHackEngine extends LibNetHack 
 {
     private Activity _context;
+    private NetHackView _view;
     private java.util.Random _random;
 
     public NetHackEngine(Activity context) 
    {
         _context=context;
+        _view=new NetHackView(context);
         _random=new java.util.Random();
    }	   
     
+   public GLSurfaceView getView() {
+       return _view;
+   }
+   
    /** 
     *   Implementations of libnethack abstract functions
     */
