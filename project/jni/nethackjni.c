@@ -123,6 +123,7 @@ void _nhjni_proxy_raw_print(const char *str) {
   jmethodID mid = (*_nhjni_env)->GetMethodID(_nhjni_env,cls, "raw_print", "(Ljava/lang/String;)V");
   jstring js = (*_nhjni_env)->NewStringUTF(_nhjni_env,str);
   (*_nhjni_env)->CallVoidMethod(_nhjni_env,cls, mid, js);
+  (*_nhjni_env)->DeleteLocalRef(_nhjni_env, cls);
 }
 
 void _nhjni_proxy_putstr(winid window,int attr,const char *str) {
@@ -132,7 +133,7 @@ void _nhjni_proxy_putstr(winid window,int attr,const char *str) {
   jmethodID mid = (*_nhjni_env)->GetMethodID(_nhjni_env,cls, "putstr", "(IILjava/lang/String;)V");
   jstring js = (*_nhjni_env)->NewStringUTF(_nhjni_env,str);
   (*_nhjni_env)->CallVoidMethod(_nhjni_env,cls, mid, window, attr, js);
-
+  (*_nhjni_env)->DeleteLocalRef(_nhjni_env, cls);
 }
 
 int _nhjni_proxy_nhgetch() {
@@ -144,7 +145,7 @@ int _nhjni_proxy_nhgetch() {
 }
 
 int _nhjni_proxy_nh_poskey(int *x, int *y, int *mod) {
-  LOGI("nh_poskey(%d,%d,%d) not implemented.",x,y,mod);
+ // LOGI("nh_poskey(%d,%d,%d) not implemented.",x,y,mod);
   return 0;
 }
 
@@ -154,11 +155,12 @@ void _nhjni_proxy_print_glyph(int winid,int x,int y,int glyph) {
   jclass cls = (*_nhjni_env)->FindClass(_nhjni_env, "se/dinamic/nethack/LibNetHack" );
   jmethodID mid = (*_nhjni_env)->GetMethodID(_nhjni_env,cls, "print_glyph", "(IIII)V");
   (*_nhjni_env)->CallVoidMethod(_nhjni_env,cls, mid,winid,x,y,glyph);
+  (*_nhjni_env)->DeleteLocalRef(_nhjni_env, cls);
 }
 
 
 void _nhjni_proxy_display_nhwindow(int winid,int flag) {
-  LOGI("display_nhwindow(%d,%d) dispatched.",winid,flag);
+ // LOGI("display_nhwindow(%d,%d) dispatched.",winid,flag);
   (*_nhjni_vm)->AttachCurrentThread(_nhjni_vm,&_nhjni_env, NULL );
   jclass cls = (*_nhjni_env)->FindClass(_nhjni_env, "se/dinamic/nethack/LibNetHack" );
   jmethodID mid = (*_nhjni_env)->GetMethodID(_nhjni_env,cls, "display_nhwindow", "(II)V");
@@ -166,7 +168,8 @@ void _nhjni_proxy_display_nhwindow(int winid,int flag) {
   values[0].i=winid;
   values[1].i=flag;
  // (*_nhjni_env)->CallVoidMethodA(_nhjni_env,cls, mid,values);
-  LOGI("display_nhwindow(%d,%d) finished.",winid,flag);
+//  LOGI("display_nhwindow(%d,%d) finished.",winid,flag);
+  (*_nhjni_env)->DeleteLocalRef(_nhjni_env, cls);
 }
 
 int _g_StatusWinID=0;
@@ -310,7 +313,7 @@ jboolean Java_se_dinamic_nethack_LibNetHack_run( JNIEnv*  env, jobject  obj ) {
   struct stat s;
   if(stat(HACKDIR"/nhdat",&s ) != 0) mkdir(HACKDIR,0777);
   if( _nhji_copy_on_verify_fail(env,"/data/data/se.dinamic.nethack/lib/libnhdat.so",HACKDIR"/nhdat") !=0 ) return JNI_FALSE;
-    
+  chdir(HACKDIR);
   
   return nhjni_run();
 }

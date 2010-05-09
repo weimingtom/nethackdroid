@@ -5,9 +5,10 @@ LOCAL_PATH:= $(call my-dir)
 #
 # Build static nethack library
 #
+NETHACK_CFLAGS:=  -DHACKDIR="\"/sdcard/nethackdata\"" -DPORT_ID="\"Android\"" -DUSE_TILES -DPREFIXES_IN_USE
 include $(CLEAR_VARS)
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(NETHACK_SOURCES)/include
-LOCAL_CFLAGS    := -DHACKDIR="\"/sdcard/nethackdata\"" -DPORT_ID="\"Android\"" -DUSE_TILES
+LOCAL_CFLAGS    := $(NETHACK_CFLAGS)
 LOCAL_MODULE    := libnethack
 LOCAL_SRC_FILES := $(NETHACK_SOURCES)/src/allmain.c $(NETHACK_SOURCES)/src/alloc.c $(NETHACK_SOURCES)/src/apply.c $(NETHACK_SOURCES)/src/artifact.c $(NETHACK_SOURCES)/src/attrib.c $(NETHACK_SOURCES)/src/ball.c $(NETHACK_SOURCES)/src/bones.c \
 	   $(NETHACK_SOURCES)/src/botl.c $(NETHACK_SOURCES)/src/cmd.c $(NETHACK_SOURCES)/src/dbridge.c $(NETHACK_SOURCES)/src/decl.c $(NETHACK_SOURCES)/src/detect.c $(NETHACK_SOURCES)/src/dig.c $(NETHACK_SOURCES)/src/display.c $(NETHACK_SOURCES)/src/dlb.c $(NETHACK_SOURCES)/src/do.c \
@@ -35,7 +36,7 @@ include $(BUILD_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(NETHACK_SOURCES)/include
-LOCAL_CFLAGS    := -DHACKDIR="\"/sdcard/nethackdata\""
+LOCAL_CFLAGS    := $(NETHACK_CFLAGS)
 LOCAL_LDLIBS    := -llog 
 LOCAL_MODULE    := libnethackjni
 LOCAL_SRC_FILES := nethackjni.c
