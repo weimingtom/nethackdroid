@@ -1,0 +1,21 @@
+
+
+Setting up nethack source for building static nethack library
+
+Step1: Download and extract nethack-3.4.3 into this directory...
+
+Step2: Setup sources for generating data and definitionfiles needed...
+  cd nethack-3.4.3/sys/unix && chmod +x setup.sh
+  ./setup.sh
+  
+Step3: 
+  cd ../../util/ && make makedefs tileutils
+  ./makedefs -odemvpqrhz
+  ./tilemap
+
+Step4: Make the data and build the nhdat file
+  cd ../dat && make
+  cd ../ && make dlb
+  cp dat/nhdat ../../../../libs/armeabi/libnhdat.so
+
+Step4: Build libnethackjni using android ndk
