@@ -2,7 +2,7 @@
 #include <android/log.h>
 
 #include <sys/stat.h>
-
+#include <pthread.h>
 // Nethack includes
 #include <hack.h>
 #include <dlb.h>
@@ -270,30 +270,44 @@ int _nhji_copy_on_verify_fail( JNIEnv*  env,char *src, char *dest)
   return res;
 }
 
+void * _nethack_thread_proc(void *data) {
+ 
+  if( (*_nhjni_vm)->AttachCurrentThread(_nhjni_vm,&_nhjni_env, NULL) == JNI_OK) {
+    // Setup JNI dispatch method callbacks cache
+    //int verified=1;
+    jni_callback_methods[JNI_CALLBACK_INIT_NHWINDOWS] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_init_nhwindows", "()V");
+    jni_callback_methods[JNI_CALLBACK_CREATE_NHWINDOW] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_create_nhwindow", "(I)I");
+    jni_callback_methods[JNI_CALLBACK_DISPLAY_NHWINDOW] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_display_nhwindow", "(II)V");
+    jni_callback_methods[JNI_CALLBACK_PUTSTR] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_putstr", "(IILjava/lang/String;)V");
+    jni_callback_methods[JNI_CALLBACK_PRINTGLYPH] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_print_glyph", "(IIII)V");
+    jni_callback_methods[JNI_CALLBACK_RAWPRINT] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_raw_print", "(Ljava/lang/String;)V");
+    jni_callback_methods[JNI_CALLBACK_NH_POSKEY] = jni_callback_methods[JNI_CALLBACK_NHGETCH] =  (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_nhgetch", "()I");
+
+    /*
+    for( i=0;i<JNI_CALLBACK_COUNT;i++)
+      if( jni_callback_methods[i]==0) verified=0;
+
+    if( verified== 0 ) {
+      _nhjni_error = (*env)->NewStringUTF(env,"Failed to get complete nethack callback interface");
+      return JNI_FALSE;
+    }*/
+
+    
+    // Lets run nethack
+    nhjni_run();
+    
+    // Nethack ended lets cleanup and exit thread...
+    (*_nhjni_env)->DeleteGlobalRef(_nhjni_env, _nhjni_cls);
+    (*_nhjni_vm)->DetachCurrentThread(_nhjni_vm);
+  }
+}
+
 jboolean Java_se_dinamic_nethack_LibNetHack_run( JNIEnv*  env, jobject  obj ) {
   LOGD("Starting nethack session...");
   int i;
   (*env)->GetJavaVM(env,&_nhjni_vm );
-  (*_nhjni_vm)->AttachCurrentThread(_nhjni_vm,&_nhjni_env, NULL );
-  
-  // Setup JNI dispatch method callbacks cache
-  int verified=1;
-  _nhjni_cls = (*env)->FindClass(env, "se/dinamic/nethack/LibNetHack" );
-  jni_callback_methods[JNI_CALLBACK_INIT_NHWINDOWS] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_init_nhwindows", "()V");
-  jni_callback_methods[JNI_CALLBACK_CREATE_NHWINDOW] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_create_nhwindow", "(I)I");
-  jni_callback_methods[JNI_CALLBACK_DISPLAY_NHWINDOW] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_display_nhwindow", "(II)V");
-  jni_callback_methods[JNI_CALLBACK_PUTSTR] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_putstr", "(IILjava/lang/String;)V");
-  jni_callback_methods[JNI_CALLBACK_PRINTGLYPH] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_print_glyph", "(IIII)V");
-  jni_callback_methods[JNI_CALLBACK_RAWPRINT] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_raw_print", "(Ljava/lang/String;)V");
-  jni_callback_methods[JNI_CALLBACK_NH_POSKEY] = jni_callback_methods[JNI_CALLBACK_NHGETCH] =  (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_nhgetch", "()I");
-  
-  for( i=0;i<JNI_CALLBACK_COUNT;i++)
-    if( jni_callback_methods[i]==0) verified=0;
-  
-  if( verified== 0 ) {
-    _nhjni_error = (*env)->NewStringUTF(env,"Failed to get complete nethack callback interface");
-    return JNI_FALSE;
-  }
+  jclass localcls = (*env)->FindClass(env, "se/dinamic/nethack/LibNetHack" );
+  _nhjni_cls =  (*env)->NewGlobalRef(env,localcls);
   
   // Let's check if nethack data is installed into sdcard, if not do it...
   struct stat s;
@@ -301,11 +315,9 @@ jboolean Java_se_dinamic_nethack_LibNetHack_run( JNIEnv*  env, jobject  obj ) {
   if( _nhji_copy_on_verify_fail(env,"/data/data/se.dinamic.nethack/lib/libnhdat.so",HACKDIR"/nhdat") !=0 ) return JNI_FALSE;
   chdir(HACKDIR);
   
-  // This start nethack inner loop
-  int result = nhjni_run();
+  // This start nethack inner loop thread...
+  pthread_t thread = 0;
+  pthread_create(&thread, NULL, _nethack_thread_proc, NULL);
   
-  // Let's clean up before exiting
-  (*_nhjni_env)->DeleteLocalRef(_nhjni_env, _nhjni_cls);
-  
-  return result;
+  return JNI_TRUE;
 }

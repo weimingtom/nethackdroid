@@ -26,6 +26,19 @@ public class NetHackEngine extends LibNetHack
        return _view;
    }
    
+    public void start() {
+       run();
+    }
+    
+    public void onPause() {
+        _view.onPause();
+    }
+    
+    public void onResume() {
+        // Also pause/resume game when we find a way...
+        _view.onResume();
+    }
+   
    /** 
     *   Implementations of libnethack abstract functions
     */
