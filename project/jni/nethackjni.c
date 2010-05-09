@@ -37,7 +37,8 @@ jclass _nhjni_cls;
 JavaVM *_nhjni_vm;
 jstring _nhjni_error;
 enum {
-  JNI_CALLBACK_CREATE_NHWINDOW=0,
+  JNI_CALLBACK_INIT_NHWINDOWS=0,
+  JNI_CALLBACK_CREATE_NHWINDOW,
   JNI_CALLBACK_DISPLAY_NHWINDOW,
   JNI_CALLBACK_PUTSTR,
   JNI_CALLBACK_PRINTGLYPH,
@@ -124,7 +125,11 @@ void _nhjni_proxy_init() {
 }
 
 void  _nhjni_proxy_init_nhwindows(int argc,char **argv) {
+  LOGI("init_nhwindows() dispatched."); 
+  (*_nhjni_env)->CallStaticVoidMethod(_nhjni_env,_nhjni_cls, jni_callback_methods[JNI_CALLBACK_INIT_NHWINDOWS]);
+  
   // Initialize default player settings , randomize role,race,gend and align
+  /// \todo In future, get data from a startupdialog ...
   strcpy(plname,"Goliat");
   flags.initrole = pick_role(flags.initrace, flags.initgend, flags.initalign, PICK_RANDOM);
   flags.initrace = pick_race(flags.initrole, flags.initgend, flags.initalign, PICK_RANDOM);
@@ -134,24 +139,12 @@ void  _nhjni_proxy_init_nhwindows(int argc,char **argv) {
 
 void _nhjni_proxy_raw_print(const char *str) { 
   LOGI("raw_print(\"%s\") dispatched.",str); 
-  /*(*_nhjni_vm)->AttachCurrentThread(_nhjni_vm,&_nhjni_env, NULL );
-  jclass cls = (*_nhjni_env)->FindClass(_nhjni_env, "se/dinamic/nethack/LibNetHack" );
-  jmethodID mid = (*_nhjni_env)->GetMethodID(_nhjni_env,cls, "raw_print", "(Ljava/lang/String;)V");
-  jstring js = (*_nhjni_env)->NewStringUTF(_nhjni_env,str);
-  (*_nhjni_env)->CallVoidMethod(_nhjni_env,cls, mid, js);
-  (*_nhjni_env)->DeleteLocalRef(_nhjni_env, cls);*/
   jstring js = (*_nhjni_env)->NewStringUTF(_nhjni_env,str);
   (*_nhjni_env)->CallStaticVoidMethod(_nhjni_env,_nhjni_cls, jni_callback_methods[JNI_CALLBACK_RAWPRINT], js);
 }
 
 void _nhjni_proxy_putstr(winid window,int attr,const char *str) {
   LOGI("putstr(\"%s\") dispatched.",str); 
- /* (*_nhjni_vm)->AttachCurrentThread(_nhjni_vm,&_nhjni_env, NULL );
-  jclass cls = (*_nhjni_env)->FindClass(_nhjni_env, "se/dinamic/nethack/LibNetHack" );
-  jmethodID mid = (*_nhjni_env)->GetMethodID(_nhjni_env,cls, "putstr", "(IILjava/lang/String;)V");
-  jstring js = (*_nhjni_env)->NewStringUTF(_nhjni_env,str);
-  (*_nhjni_env)->CallVoidMethod(_nhjni_env,cls, mid, window, attr, js);
-  (*_nhjni_env)->DeleteLocalRef(_nhjni_env, cls);*/
   jstring js = (*_nhjni_env)->NewStringUTF(_nhjni_env,str);
   (*_nhjni_env)->CallStaticVoidMethod(_nhjni_env,_nhjni_cls, jni_callback_methods[JNI_CALLBACK_PUTSTR],window,attr, js);
 }
@@ -286,6 +279,7 @@ jboolean Java_se_dinamic_nethack_LibNetHack_run( JNIEnv*  env, jobject  obj ) {
   // Setup JNI dispatch method callbacks cache
   int verified=1;
   _nhjni_cls = (*env)->FindClass(env, "se/dinamic/nethack/LibNetHack" );
+  jni_callback_methods[JNI_CALLBACK_INIT_NHWINDOWS] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_init_nhwindows", "()V");
   jni_callback_methods[JNI_CALLBACK_CREATE_NHWINDOW] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_create_nhwindow", "(I)I");
   jni_callback_methods[JNI_CALLBACK_DISPLAY_NHWINDOW] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_display_nhwindow", "(II)V");
   jni_callback_methods[JNI_CALLBACK_PUTSTR] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_putstr", "(IILjava/lang/String;)V");
