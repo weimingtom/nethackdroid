@@ -14,9 +14,7 @@
 
 NEARDATA struct window_procs windowprocs;
 
-JNIEnv *_nhjni_env;
-JavaVM *_nhjni_vm;
-jstring _nhjni_error;
+
   
 /// Nethack proxy functions
 void _nhjni_proxy_init();
@@ -34,6 +32,24 @@ void choose_windows(const char *s) {}
 void more() {}
 void ospeed() {}
   
+JNIEnv *_nhjni_env;
+jclass _nhjni_cls;
+JavaVM *_nhjni_vm;
+jstring _nhjni_error;
+enum {
+  JNI_CALLBACK_CREATE_NHWINDOW=0,
+  JNI_CALLBACK_DISPLAY_NHWINDOW,
+  JNI_CALLBACK_PUTSTR,
+  JNI_CALLBACK_PRINTGLYPH,
+  JNI_CALLBACK_RAWPRINT,
+  JNI_CALLBACK_NHGETCH,
+  JNI_CALLBACK_NH_POSKEY,
+  
+  JNI_CALLBACK_COUNT
+};
+jmethodID jni_callback_methods[JNI_CALLBACK_COUNT];
+
+  
 /** The proxy object for nethack library */
 struct window_procs _nhjni_proxy_procs = {
     "nhjni_proxy",
@@ -48,7 +64,7 @@ struct window_procs _nhjni_proxy_procs = {
     donull,						// nhjni_proxy_resume_nhwindows,
     _nhjni_proxy_create_nhwindow,						// nhjni_proxy_create_nhwindow,
     donull,						// nhjni_proxy_clear_nhwindow,
-    _nhjni_proxy_display_nhwindow,						// nhjni_proxy_display_nhwindow,
+    _nhjni_proxy_display_nhwindow,	// nhjni_proxy_display_nhwindow,
     donull,						// nhjni_proxy_destroy_nhwindow,
     donull,						// nhjni_proxy_curs,
     _nhjni_proxy_putstr,			// nhjni_proxy_putstr,
@@ -118,95 +134,54 @@ void  _nhjni_proxy_init_nhwindows(int argc,char **argv) {
 
 void _nhjni_proxy_raw_print(const char *str) { 
   LOGI("raw_print(\"%s\") dispatched.",str); 
-  (*_nhjni_vm)->AttachCurrentThread(_nhjni_vm,&_nhjni_env, NULL );
+  /*(*_nhjni_vm)->AttachCurrentThread(_nhjni_vm,&_nhjni_env, NULL );
   jclass cls = (*_nhjni_env)->FindClass(_nhjni_env, "se/dinamic/nethack/LibNetHack" );
   jmethodID mid = (*_nhjni_env)->GetMethodID(_nhjni_env,cls, "raw_print", "(Ljava/lang/String;)V");
   jstring js = (*_nhjni_env)->NewStringUTF(_nhjni_env,str);
   (*_nhjni_env)->CallVoidMethod(_nhjni_env,cls, mid, js);
-  (*_nhjni_env)->DeleteLocalRef(_nhjni_env, cls);
+  (*_nhjni_env)->DeleteLocalRef(_nhjni_env, cls);*/
+  jstring js = (*_nhjni_env)->NewStringUTF(_nhjni_env,str);
+  (*_nhjni_env)->CallStaticVoidMethod(_nhjni_env,_nhjni_cls, jni_callback_methods[JNI_CALLBACK_RAWPRINT], js);
 }
 
 void _nhjni_proxy_putstr(winid window,int attr,const char *str) {
   LOGI("putstr(\"%s\") dispatched.",str); 
- (*_nhjni_vm)->AttachCurrentThread(_nhjni_vm,&_nhjni_env, NULL );
+ /* (*_nhjni_vm)->AttachCurrentThread(_nhjni_vm,&_nhjni_env, NULL );
   jclass cls = (*_nhjni_env)->FindClass(_nhjni_env, "se/dinamic/nethack/LibNetHack" );
   jmethodID mid = (*_nhjni_env)->GetMethodID(_nhjni_env,cls, "putstr", "(IILjava/lang/String;)V");
   jstring js = (*_nhjni_env)->NewStringUTF(_nhjni_env,str);
   (*_nhjni_env)->CallVoidMethod(_nhjni_env,cls, mid, window, attr, js);
-  (*_nhjni_env)->DeleteLocalRef(_nhjni_env, cls);
+  (*_nhjni_env)->DeleteLocalRef(_nhjni_env, cls);*/
+  jstring js = (*_nhjni_env)->NewStringUTF(_nhjni_env,str);
+  (*_nhjni_env)->CallStaticVoidMethod(_nhjni_env,_nhjni_cls, jni_callback_methods[JNI_CALLBACK_PUTSTR],window,attr, js);
 }
 
 int _nhjni_proxy_nhgetch() {
   LOGI("nhgetch() dispatched."); return 0; 
-  (*_nhjni_vm)->AttachCurrentThread(_nhjni_vm,&_nhjni_env, NULL );
-  jclass cls = (*_nhjni_env)->FindClass(_nhjni_env, "se/dinamic/nethack/LibNetHack" );
-  jmethodID mid = (*_nhjni_env)->GetMethodID(_nhjni_env,cls, "nhgetch", "(V)I");
-  return (*_nhjni_env)->CallIntMethod(_nhjni_env,cls, mid);
+ return (*_nhjni_env)->CallStaticIntMethod(_nhjni_env,_nhjni_cls, jni_callback_methods[JNI_CALLBACK_NHGETCH]);
 }
 
 int _nhjni_proxy_nh_poskey(int *x, int *y, int *mod) {
- // LOGI("nh_poskey(%d,%d,%d) not implemented.",x,y,mod);
+  // LOGI("nh_poskey(%d,%d,%d) not implemented.",x,y,mod);
+  return (*_nhjni_env)->CallStaticIntMethod(_nhjni_env,_nhjni_cls, jni_callback_methods[JNI_CALLBACK_NH_POSKEY]);
   return 0;
 }
 
 void _nhjni_proxy_print_glyph(int winid,int x,int y,int glyph) {
   LOGI("print_glyph(%d,%d,%d,%d) dispatched.",winid,x,y,glyph);
-  (*_nhjni_vm)->AttachCurrentThread(_nhjni_vm,&_nhjni_env, NULL );
-  jclass cls = (*_nhjni_env)->FindClass(_nhjni_env, "se/dinamic/nethack/LibNetHack" );
-  jmethodID mid = (*_nhjni_env)->GetMethodID(_nhjni_env,cls, "print_glyph", "(IIII)V");
-  (*_nhjni_env)->CallVoidMethod(_nhjni_env,cls, mid,winid,x,y,glyph);
-  (*_nhjni_env)->DeleteLocalRef(_nhjni_env, cls);
+  (*_nhjni_env)->CallStaticVoidMethod(_nhjni_env,_nhjni_cls, jni_callback_methods[JNI_CALLBACK_PRINTGLYPH],winid,x,y,glyph);
 }
 
 
 void _nhjni_proxy_display_nhwindow(int winid,int flag) {
- // LOGI("display_nhwindow(%d,%d) dispatched.",winid,flag);
-  (*_nhjni_vm)->AttachCurrentThread(_nhjni_vm,&_nhjni_env, NULL );
-  jclass cls = (*_nhjni_env)->FindClass(_nhjni_env, "se/dinamic/nethack/LibNetHack" );
-  jmethodID mid = (*_nhjni_env)->GetMethodID(_nhjni_env,cls, "display_nhwindow", "(II)V");
-  jvalue values[2];
-  values[0].i=winid;
-  values[1].i=flag;
- // (*_nhjni_env)->CallVoidMethodA(_nhjni_env,cls, mid,values);
-//  LOGI("display_nhwindow(%d,%d) finished.",winid,flag);
-  (*_nhjni_env)->DeleteLocalRef(_nhjni_env, cls);
+  //LOGI("display_nhwindow(%d,%d) dispatched.",winid,flag);
+  (*_nhjni_env)->CallStaticVoidMethod(_nhjni_env,_nhjni_cls,  jni_callback_methods[JNI_CALLBACK_DISPLAY_NHWINDOW],winid,flag);
 }
 
-int _g_StatusWinID=0;
-int _nhjni_proxy_create_nhwindow(int type) {
-  int id = 1+(rand()%50);
-  char *win="";
-  switch(type) {
-    case NHW_MESSAGE:
-      win="NHW_MESSAGE";
-    break;
-    
-    case NHW_STATUS:
-      _g_StatusWinID=id;
-      win="NHW_STATUS";
-    break;
-    
-    case NHW_MAP:
-      win="NHW_MAP";
-    break;
-    
-    case NHW_MENU:
-      win="NHW_MENU";
-    break;
-    
-    case NHW_TEXT:
-      win="NHW_TEXT";
-    break;
-    
-    default:
-      win="Unknown type";
-    break;
-  }
-  LOGI("Create window type '%s' id %d\n",win,id);
-  return id;
+int _nhjni_proxy_create_nhwindow(int type) {	
+  LOGI("create_nhwindow(%d) dispatched.",type);
+  return (*_nhjni_env)->CallStaticIntMethod(_nhjni_env,_nhjni_cls, jni_callback_methods[JNI_CALLBACK_CREATE_NHWINDOW],type);
 }
-  
-
 
 jboolean nhjni_run() {
   windowprocs = _nhjni_proxy_procs;
@@ -268,8 +243,6 @@ jstring Java_se_dinamic_nethack_LibNetHack_error( JNIEnv*  env, jobject  obj ) {
   return _nhjni_error;
 }
 
-
-
 int _nhji_copy_file(char *src, char *dest) 
 {
   FILE *from,*to;
@@ -306,14 +279,39 @@ int _nhji_copy_on_verify_fail( JNIEnv*  env,char *src, char *dest)
 
 jboolean Java_se_dinamic_nethack_LibNetHack_run( JNIEnv*  env, jobject  obj ) {
   LOGD("Starting nethack session...");
+  int i;
   (*env)->GetJavaVM(env,&_nhjni_vm );
-
-  // Let's check if nhdat is installed, if not do it...
-  // "/data/data/se.dinamic.nethack/libs/libnhdat.so"
+  (*_nhjni_vm)->AttachCurrentThread(_nhjni_vm,&_nhjni_env, NULL );
+  
+  // Setup JNI dispatch method callbacks cache
+  int verified=1;
+  _nhjni_cls = (*env)->FindClass(env, "se/dinamic/nethack/LibNetHack" );
+  jni_callback_methods[JNI_CALLBACK_CREATE_NHWINDOW] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_create_nhwindow", "(I)I");
+  jni_callback_methods[JNI_CALLBACK_DISPLAY_NHWINDOW] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_display_nhwindow", "(II)V");
+  jni_callback_methods[JNI_CALLBACK_PUTSTR] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_putstr", "(IILjava/lang/String;)V");
+  jni_callback_methods[JNI_CALLBACK_PRINTGLYPH] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_print_glyph", "(IIII)V");
+  jni_callback_methods[JNI_CALLBACK_RAWPRINT] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_raw_print", "(Ljava/lang/String;)V");
+  jni_callback_methods[JNI_CALLBACK_NH_POSKEY] = jni_callback_methods[JNI_CALLBACK_NHGETCH] =  (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_nhgetch", "()I");
+  
+  for( i=0;i<JNI_CALLBACK_COUNT;i++)
+    if( jni_callback_methods[i]==0) verified=0;
+  
+  if( verified== 0 ) {
+    _nhjni_error = (*env)->NewStringUTF(env,"Failed to get complete nethack callback interface");
+    return JNI_FALSE;
+  }
+  
+  // Let's check if nethack data is installed into sdcard, if not do it...
   struct stat s;
-  if(stat(HACKDIR"/nhdat",&s ) != 0) mkdir(HACKDIR,0777);
+  if(stat(HACKDIR"/nhdat",&s ) != 0) mkdir(HACKDIR,0777); // This would probabley want to be recursive HACKDIR changes.. but it suits for now..
   if( _nhji_copy_on_verify_fail(env,"/data/data/se.dinamic.nethack/lib/libnhdat.so",HACKDIR"/nhdat") !=0 ) return JNI_FALSE;
   chdir(HACKDIR);
   
-  return nhjni_run();
+  // This start nethack inner loop
+  int result = nhjni_run();
+  
+  // Let's clean up before exiting
+  (*_nhjni_env)->DeleteLocalRef(_nhjni_env, _nhjni_cls);
+  
+  return result;
 }

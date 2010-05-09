@@ -23,10 +23,11 @@ public class NetHack extends Activity
         private Activity _activity;
         public NetHackThread(Activity activity) {
             _activity=activity;
+	    _engine = new NetHackEngine(_activity);
         }
         
         public void run() {
-            _engine=new NetHackEngine(_activity);
+            
             if( !_engine.run() ) {
                 Toast toast = Toast.makeText(_activity, "Failed to initialize nethack with reason:\n "+_engine.error(), Toast.LENGTH_LONG);
                 toast.show();
