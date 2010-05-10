@@ -1,24 +1,7 @@
 
-
 Setting up nethack source for building static nethack library
 
-Step1: Download and extract nethack-3.4.3 into this directory...
+Step1: Setup the nethack sources
+	chmod +x bootstrap.sh && ./bootstrap.sh
 
-Step2: Setup sources for generating data and definitionfiles needed...
-  cd nethack-3.4.3/sys/unix && chmod +x setup.sh
-  ./setup.sh
-
-Step2.5: Enable DLB (all data files into a dat file)
-  Uncomment the #define DLB in include/config.h
-
-Step3: 
-  cd ../../util/ && make makedefs tileutils
-  ./makedefs -odemvpqrhz
-  ./tilemap
-
-Step4: Make the data and build the nhdat file
-  cd ../dat && make
-  cd ../ && make dlb
-  cp dat/nhdat ../../libs/armeabi/libnhdat.so
-
-Step4: Build libnethackjni using android ndk
+Step2: Build libnethackjni using android ndk
