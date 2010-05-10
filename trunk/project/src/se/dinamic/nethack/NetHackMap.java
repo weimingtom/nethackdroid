@@ -18,7 +18,7 @@ class NetHackMap {
 	}
 	
 	public void handleGlyph(int x, int y,int glyph) {
-		if( glyph>=319 && glyph<=340 ) { // we got a player glyph
+		if( glyph<=394 ) { // we got a player glyph
 			_playerX=x;
 			_playerY=y;
 		}
