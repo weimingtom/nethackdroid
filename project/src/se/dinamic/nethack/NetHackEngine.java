@@ -27,7 +27,9 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
 	_map = maprenderer;
 	
 	_keyevent = new KeyEventQueue();
-        
+         
+	_map.handleGlyph(0,0,1);
+	   
 	   // Setup view
 	_view=new NetHackView(context);
 	_view.addRenderer(maprenderer);
@@ -67,7 +69,7 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
     
     public void onPutStr(int winid,int attr,String status) { }
     
-    public void onPrintGlyph(int winid,int x,int y,int glyph) { }
+    public void onPrintGlyph(int winid,int x,int y,int glyph) { _map.handleGlyph(x,y,glyph); }
    
     public int onGetKey() { return _keyevent.getKey(); }
    
