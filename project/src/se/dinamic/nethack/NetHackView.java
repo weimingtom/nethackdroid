@@ -13,16 +13,21 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
 {
     private GL10 _gl;
     private Vector _renderers;
-    
-   
+    private Context _context;
+    private NetHackTileAtlas _tileset;
     
     public NetHackView(Context context) {
         super(context);
-        
+        _context=context;
         _renderers=new Vector<NetHackRenderer>();
         setFocusable( true ); 
         setFocusableInTouchMode( true );
         setRenderer( this );
+    }
+    
+    public NetHackTileAtlas loadTileset( int resid ) {
+	_tileset=NetHackTileAtlas.createFromResource( _context, resid );
+	return _tileset;
     }
     
     public void addRenderer(NetHackRenderer r) {
@@ -46,6 +51,11 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
     }
     
     public void onSurfaceCreated( GL10 gl, EGLConfig config ) {
+	_gl=gl;
+	    
+	// Generate texture
+	_tileset.generate(gl);
+	    
         gl.glDisable( GL10.GL_DITHER );
         gl.glHint( GL10.GL_PERSPECTIVE_CORRECTION_HINT , GL10.GL_NICEST );
         gl.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f);
@@ -62,9 +72,10 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
         // All objects rendered have varr, carr and textcoordarr soo this is put here
         // for performance
         gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-       // gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
-       // gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+        //gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
+	gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 
+	
     } 
     
     public void onSurfaceChanged( GL10 gl, int width, int height ) {

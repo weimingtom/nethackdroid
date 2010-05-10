@@ -10,33 +10,32 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class NetHackMapRenderer extends NetHackMap implements NetHackRenderer{
-	
-	private float _tile_v[] = {
-	      -0.5f,  0.5f, 0.0f,  // 0, Top Left
-	      -0.5f, -0.5f, 0.0f,  // 1, Bottom Left
-	       0.5f, -0.5f, 0.0f,  // 2, Bottom Right
-	       0.5f,  0.5f, 0.0f,  // 3, Top Right
+	private NetHackTileAtlas _atlas;
+	private static float PLANE_VERTICES[] = {
+		-0.5f, -0.5f,  0.0f,	// Image plane
+		 0.5f, -0.5f,  0.0f,
+		-0.5f,  0.5f,  0.0f,
+		 0.5f,  0.5f,  0.0f
 	};
 	
-	private short[] _tile_i = { 0, 1, 2, 0, 2, 3 };
+	private float PLANE_TEXTURE_COORDS[] = {
+		0.0f, 1.0f,
+		1.0f, 1.0f,
+		0.0f, 0.0f,
+		1.0f, 0.0f
+	};
 	
-	public FloatBuffer _tile_varr;
-	public ShortBuffer _tile_iarr;
-    
+	public FloatBuffer _planeVertices;
+	public FloatBuffer _planeTextureCoords;
+	
 	public NetHackMapRenderer() {
 		// Setup tile object
-		ByteBuffer vbb = ByteBuffer.allocateDirect(_tile_v.length * 4);
-		vbb.order(ByteOrder.nativeOrder());
-		_tile_varr = vbb.asFloatBuffer();
-		_tile_varr.put(_tile_v);
-		_tile_varr.position(0);
-        
-		ByteBuffer ibb = ByteBuffer.allocateDirect(_tile_i.length * 2);
-		ibb.order(ByteOrder.nativeOrder());
-		_tile_iarr = ibb.asShortBuffer();
-		_tile_iarr.put(_tile_i);
-		_tile_iarr.position(0);
-        
+		_planeVertices 		= FloatBuffer.wrap( PLANE_VERTICES, 0, PLANE_VERTICES.length  );
+		_planeTextureCoords	= FloatBuffer.wrap( PLANE_TEXTURE_COORDS, 0, PLANE_TEXTURE_COORDS.length );
+	}
+	
+	public void setTileset(NetHackTileAtlas atlas) {
+		_atlas=atlas;
 	}
 	
 	public void render(GL10 gl) {
@@ -44,8 +43,17 @@ public class NetHackMapRenderer extends NetHackMap implements NetHackRenderer{
 		// Translate map so its centered on player
 		gl.glTranslatef(-_playerX,-_playerY,0);
 		
+		
+		// Get tile texture coords
+		FloatBuffer _tile_tcarr=FloatBuffer.allocate(8);
+		_atlas.generateTextureCoords(1,_tile_tcarr);
+		
+		
 		gl.glPushMatrix();
+		gl.glEnable(GL10.GL_TEXTURE_2D);
+		gl.glBindTexture(GL10.GL_TEXTURE_2D,_atlas.texture());
 		// Run thru all entries in map and render tile
+		int tile=-1;
 		for(int y=0;y<NetHackMap.SIZE;y++) {
 			// Translate into y 
 			gl.glTranslatef(0,1,0);
@@ -54,13 +62,19 @@ public class NetHackMapRenderer extends NetHackMap implements NetHackRenderer{
 			
 				int glyph=get(x,y);
 				if(  glyph != 0 ) {
+					if( tile != LibNetHack.glyph2tile(glyph) ) {
+						tile = LibNetHack.glyph2tile(glyph);
+						_atlas.generateTextureCoords(tile,_tile_tcarr);
+					}
 					// Render the texturemapped tile
-					gl.glVertexPointer(3, gl.GL_FLOAT, 0, _tile_varr);
-					gl.glDrawElements(GL10.GL_TRIANGLES, _tile_i.length, GL10.GL_UNSIGNED_SHORT, _tile_iarr);
+					gl.glTexCoordPointer(2, gl.GL_FLOAT, 0, _tile_tcarr);
+					gl.glVertexPointer(3, gl.GL_FLOAT, 0, _planeVertices);
+					gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, 4 );
 				}
 			}
 			gl.glTranslatef(-NetHackMap.SIZE,0,0);
 		}
 		gl.glPopMatrix();
+	
 	}
 }
