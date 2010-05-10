@@ -53,7 +53,7 @@ jmethodID jni_callback_methods[JNI_CALLBACK_COUNT];
   
 /** The proxy object for nethack library */
 struct window_procs _nhjni_proxy_procs = {
-    "nhjni_proxy",
+    "Android",
     WC_COLOR|WC_HILITE_PET,
     0L,
     _nhjni_proxy_init_nhwindows,		// nhjni_proxy_init_nhwindows,

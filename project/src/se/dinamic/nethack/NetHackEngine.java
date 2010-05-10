@@ -1,6 +1,7 @@
 package se.dinamic.nethack;
 
 import java.util.Random;
+import android.util.Log;
 import android.view.View;
 import android.view.KeyEvent;
 import android.app.Activity;
@@ -8,7 +9,6 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import android.opengl.GLSurfaceView;
-
 
 public class NetHackEngine extends LibNetHack implements View.OnKeyListener
 {
@@ -55,27 +55,23 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
         Toast toast = Toast.makeText(_context, status, Toast.LENGTH_LONG);
         toast.show();
     }
-    public void onPutStr(int winid,int attr,String status) {
-    }
-    public void onPrintGlyph(int winid,int x,int y,int glyph) {
-        
-    }
+    
+    public void onPutStr(int winid,int attr,String status) { }
+    
+    public void onPrintGlyph(int winid,int x,int y,int glyph) { }
    
-    public int onGetKey() {
-        return _keyevent.getKey();
-    }
+    public int onGetKey() { return _keyevent.getKey(); }
    
-    public int onCreateWindow(int type) {
-        return 1+(_random.nextInt()%50);
-    }
+    public int onCreateWindow(int type) { return 1+(_random.nextInt()%50); }
     
     public void onDisplayWindow(int winid,int flag) {
     }
     
-    /*
-     *  View.onKeyListener implementation
+    /**
+     *  implementation of View.onKeyListener 
      */
     public boolean onKey(View v, int keyCode, KeyEvent event) {
+	Log.v("NetHackEngine.onKey","on key "+keyCode);
 	_keyevent.addKey(keyCode);
 	return true;
     }
