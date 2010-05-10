@@ -5,26 +5,40 @@ import android.content.Context;
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+import java.util.Vector;
 
 class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer 
 {
     private GL10 _gl;
+    private Vector _renderers;
     
     public NetHackView(Context context) {
         super(context);
+        _renderers=new Vector<NetHackRenderer>();
         setFocusable( true ); 
         setFocusableInTouchMode( true );
         setRenderer( this );
+    }
+    
+    public void addRenderer(NetHackRenderer r) {
+        _renderers.add(r);
     }
     
     public void onDrawFrame( GL10 gl ) {
         // Clear gl buffer
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT |  GL10.GL_STENCIL_BUFFER_BIT);
         
-        // Setup camera/viewpoint
+        // Setup viewpoint and camera
         gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadIdentity();
-        gl.glTranslatef(0,0,-4);
+        gl.glTranslatef(0,-10,-10);
+        gl.glRotatef(45.0f,1.0f,0.0f,0.0f);
+        
+        // Run thru all renderers to render the scene
+        for(int i=0;i<_renderers.size();i++) {
+            NetHackRenderer r=(NetHackRenderer)_renderers.get(i);
+            r.render( gl );
+        }
         
     }
     

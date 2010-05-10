@@ -16,12 +16,21 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
     private NetHackView _view;
     private KeyEventQueue _keyevent;
     private java.util.Random _random;
-
+    
+    private NetHackMap _map;
+	
     public NetHackEngine(Activity context) 
    {
-        _context=context;
+	_context=context;
+	
+	NetHackMapRenderer maprenderer=new NetHackMapRenderer();
+	_map = maprenderer;
+	
 	_keyevent = new KeyEventQueue();
-        _view=new NetHackView(context);
+        
+	   // Setup view
+	_view=new NetHackView(context);
+	_view.addRenderer(maprenderer);
 	_view.setOnKeyListener(this);
         _random=new java.util.Random();
    }	   
