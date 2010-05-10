@@ -12,6 +12,8 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
     
     public NetHackView(Context context) {
         super(context);
+        setFocusable( true ); 
+        setFocusableInTouchMode( true );
         setRenderer( this );
     }
     
