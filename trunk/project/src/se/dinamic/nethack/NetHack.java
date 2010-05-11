@@ -28,6 +28,7 @@ import android.view.WindowManager;
 
 public class NetHack extends Activity 
 {
+    public final static String LOGTAG="NetHackDroid";
     private NetHackEngine  _nethack;
     /** Called when the activity is first created. */
     @Override

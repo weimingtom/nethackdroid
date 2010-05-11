@@ -32,7 +32,6 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
     private GL10 _gl;
     private Vector _renderers;
     private Context _context;
-    private NetHackTileAtlas _tileset;
     
     public NetHackView(Context context) {
         super(context);
@@ -43,10 +42,6 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
         setRenderer( this );
     }
     
-    public NetHackTileAtlas loadTileset( int resid ) {
-	_tileset=NetHackTileAtlas.createFromResource( _context, resid );
-	return _tileset;
-    }
     
     public void addRenderer(NetHackRenderer r) {
         _renderers.add(r);
@@ -71,9 +66,12 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
     public void onSurfaceCreated( GL10 gl, EGLConfig config ) {
 	_gl=gl;
 	    
-	// Generate texture
-	_tileset.generate(gl);
-	    
+	// Pass initialize to all renderers...
+	for(int i=0;i<_renderers.size();i++) {
+            NetHackRenderer r=(NetHackRenderer)_renderers.get(i);
+            r.init( gl );
+        }
+	
         gl.glDisable( GL10.GL_DITHER );
         gl.glHint( GL10.GL_PERSPECTIVE_CORRECTION_HINT , GL10.GL_NICEST );
         gl.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f);

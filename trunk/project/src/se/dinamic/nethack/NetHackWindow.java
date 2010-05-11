@@ -17,9 +17,7 @@
 */
 
 package se.dinamic.nethack;
-import javax.microedition.khronos.opengles.GL10;
 
-public interface NetHackRenderer {
-	public void init(GL10 gl);
-	public void render(GL10 gl);
+public interface NetHackWindow extends NetHackRenderer {
+	public void handleGlyph(int x,int y, int glyph);
 }

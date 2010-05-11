@@ -43,14 +43,14 @@ public class NetHackTileAtlas {
 	private int _texture[];
 	private ByteBuffer _bitmapdata;
 	
-	public static NetHackTileAtlas createFromResource(Context context,  int resid) {
+	public static NetHackTileAtlas createFromResource(Resources resources,  int resid) {
 		NetHackTileAtlas atlas=new NetHackTileAtlas();
-		atlas.loadFromResource(context,resid);
+		atlas.loadFromResource(resources,resid);
 		return atlas;
 	}
 	
-	private void loadFromResource(Context context,int id) {
-		Resources resources = context.getResources();
+	private void loadFromResource(Resources resources,int id) {
+		//Resources resources = context.getResources();
 		Bitmap bmp = BitmapFactory.decodeResource( resources, id );
 		Bitmap realbmp = bmp.copy(Config.ARGB_8888, false);
 		
