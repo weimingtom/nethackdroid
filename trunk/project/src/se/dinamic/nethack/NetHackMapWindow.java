@@ -75,12 +75,14 @@ public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 	
 	public void render(GL10 gl) {
 		if( _isDisplayed ) {
+			
+			gl.glPushMatrix();
+			// Move camera back 10 units..
+			gl.glTranslatef(0,0,-10);
+
 			// Translate map so its centered on player
 			gl.glTranslatef(-_playerX,-_playerY,0);
 
-			gl.glPushMatrix();
-			
-			
 			gl.glEnable(GL10.GL_TEXTURE_2D);
 			gl.glBindTexture(GL10.GL_TEXTURE_2D,_atlas.texture());
 			
@@ -91,8 +93,10 @@ public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 			Iterator<Entry> it = get().iterator();
 			int glyph=0;
 			if( it.hasNext() ) {		
-				float current_x=0;
-				float current_y=0;
+				
+				float current_x = 0;
+				float current_y = 0;
+				
 				do {
 					Entry<NetHackMap.Position,Integer> e = it.next();
 					
