@@ -54,7 +54,6 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
         // Setup viewpoint and camera
         gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadIdentity();
-        gl.glTranslatef(0,0,-10);
         
         // Run thru all renderers to render the scene
         for(int i=0;i<_renderers.size();i++) {
