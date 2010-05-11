@@ -156,20 +156,20 @@ void  _nhjni_proxy_init_nhwindows(int argc,char **argv) {
 }
 
 void _nhjni_proxy_raw_print(const char *str) { 
-  LOGI("raw_print(\"%s\") dispatched.",str); 
+  //LOGI("raw_print(\"%s\") dispatched.",str); 
   jstring js = (*_nhjni_env)->NewStringUTF(_nhjni_env,str);
   (*_nhjni_env)->CallStaticVoidMethod(_nhjni_env,_nhjni_cls, jni_callback_methods[JNI_CALLBACK_RAWPRINT], js);
 }
 
 void _nhjni_proxy_putstr(winid window,int attr,const char *str) {
-  LOGI("putstr(\"%s\") dispatched.",str); 
+  //LOGI("putstr(\"%s\") dispatched.",str); 
   jstring js = (*_nhjni_env)->NewStringUTF(_nhjni_env,str);
   (*_nhjni_env)->CallStaticVoidMethod(_nhjni_env,_nhjni_cls, jni_callback_methods[JNI_CALLBACK_PUTSTR],window,attr, js);
 }
 
 int _nhjni_proxy_nhgetch() {
-  LOGI("nhgetch() dispatched."); return 0; 
- return (*_nhjni_env)->CallStaticIntMethod(_nhjni_env,_nhjni_cls, jni_callback_methods[JNI_CALLBACK_NHGETCH]);
+  //LOGI("nhgetch() dispatched."); return 0; 
+  return (*_nhjni_env)->CallStaticIntMethod(_nhjni_env,_nhjni_cls, jni_callback_methods[JNI_CALLBACK_NHGETCH]);
 }
 
 int _nhjni_proxy_nh_poskey(int *x, int *y, int *mod) {
@@ -179,7 +179,7 @@ int _nhjni_proxy_nh_poskey(int *x, int *y, int *mod) {
 }
 
 void _nhjni_proxy_print_glyph(int winid,int x,int y,int glyph) {
-  LOGI("print_glyph(%d,%d,%d,%d) dispatched.",winid,x,y,glyph);
+  //LOGI("print_glyph(%d,%d,%d,%d) dispatched.",winid,x,y,glyph);
   (*_nhjni_env)->CallStaticVoidMethod(_nhjni_env,_nhjni_cls, jni_callback_methods[JNI_CALLBACK_PRINTGLYPH],winid,x,y,glyph);
 }
 
@@ -190,7 +190,7 @@ void _nhjni_proxy_display_nhwindow(int winid,int flag) {
 }
 
 int _nhjni_proxy_create_nhwindow(int type) {	
-  LOGI("create_nhwindow(%d) dispatched.",type);
+  //LOGI("create_nhwindow(%d) dispatched.",type);
   return (*_nhjni_env)->CallStaticIntMethod(_nhjni_env,_nhjni_cls, jni_callback_methods[JNI_CALLBACK_CREATE_NHWINDOW],type);
 }
 

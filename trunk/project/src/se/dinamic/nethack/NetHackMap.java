@@ -34,7 +34,7 @@ class NetHackMap {
 	public int get(int x,int y) {
 		return _map[x][y];
 	}
-	
+		
 	public void handleGlyph(int x, int y,int glyph) {
 		if( glyph<=394 ) { // we got a player glyph
 			_playerX=x;

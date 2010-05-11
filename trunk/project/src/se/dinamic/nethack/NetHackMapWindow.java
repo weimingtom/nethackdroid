@@ -27,8 +27,9 @@ import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class NetHackMapWindow extends NetHackMap implements NetHackWindow{
+public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 	private NetHackTileAtlas _atlas;
+	
 	private static float PLANE_VERTICES[] = {
 		-0.5f, -0.5f,  0.0f,	// Image plane
 		 0.5f, -0.5f,  0.0f,
@@ -56,10 +57,13 @@ public class NetHackMapWindow extends NetHackMap implements NetHackWindow{
 		_atlas=atlas;
 	}
 	
+	public void display(int flag) {};
+	public void putStr(int attr,String str) {};
+	
 	public void init(GL10 gl) {}
 	
 	public void render(GL10 gl) {
-		
+
 		// Translate map so its centered on player
 		gl.glTranslatef(-_playerX,-_playerY,0);
 		
@@ -95,6 +99,5 @@ public class NetHackMapWindow extends NetHackMap implements NetHackWindow{
 			gl.glTranslatef(-NetHackMap.SIZE,0,0);
 		}
 		gl.glPopMatrix();
-	
 	}
 }

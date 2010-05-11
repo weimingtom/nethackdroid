@@ -79,7 +79,7 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
         toast.show();
     }
     
-    public void onPutStr(int winid,int attr,String status) { }
+    public void onPutStr(int winid,int attr,String status) { _wm.putStr( winid, attr, status); }
     
     public void onPrintGlyph(int winid,int x,int y,int glyph) { _wm.handleGlyph( winid, x, y, glyph ); }
    
@@ -93,8 +93,10 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
      *  implementation of View.onKeyListener 
      */
     public boolean onKey(View v, int keyCode, KeyEvent event) {
-	Log.v("NetHackEngine.onKey","on key "+keyCode);
-	_keyevent.addKey(keyCode);
+	int action=event.getAction();
+	if( action == KeyEvent.ACTION_DOWN || action ==KeyEvent.ACTION_MULTIPLE)
+		_keyevent.addKey(keyCode);
+	
 	return true;
     }
 }
