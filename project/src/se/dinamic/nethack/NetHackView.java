@@ -21,7 +21,7 @@ package se.dinamic.nethack;
 import android.opengl.GLSurfaceView;
 import android.content.Context;
 
-
+import android.graphics.Typeface;
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -40,6 +40,8 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
         setFocusable( true ); 
         setFocusableInTouchMode( true );
         setRenderer( this );
+	    
+	FontAtlasTexture._typeFace = Typeface.createFromAsset(context.getAssets(), "fonts/Isabella.ttf") ;
     }
     
     

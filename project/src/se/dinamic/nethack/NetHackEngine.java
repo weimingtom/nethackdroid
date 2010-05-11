@@ -70,7 +70,7 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
     *   Implementations of libnethack abstract functions
     */
     public void onInitWindows() {
-        // Let do the splash screen....
+        // Les do the splash screen....
     }
     
     public void onRawPrint(String status) {

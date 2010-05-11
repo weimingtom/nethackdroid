@@ -127,7 +127,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 			case NHW_TEXT:
 			{
 				Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() creating text window.");
-				NetHackTextWindow tw=new NetHackTextWindow(_resources);
+				NetHackTextWindow tw=new NetHackTextWindow();
 				doModalWindow( new Window(winid,type,tw) );
 			} break;
 			default:
@@ -174,12 +174,19 @@ public class NetHackWindowManager implements NetHackRenderer {
 	
 	public void init(GL10 gl) {
 		Log.d(NetHack.LOGTAG,"NetHackWindowManager.init() Intialize window manager renderer.");
-		_tileset = NetHackTileAtlas.createFromResource(_resources,R.drawable.absurd16);
-		_tileset.generate( gl );
-		_mapWindow.setTileset(_tileset);
+		
+		// intialize the fontatlastexture 
+		FontAtlasTexture.initialize(gl);
+		
+		// initialize tile atlas for map window
+		NetHackMapWindow.initialize(gl,_resources);
+		
+		// Initialize text window static data
+		NetHackTextWindow.initialize(gl,_resources);
 	}
 	
 	public void render(GL10 gl) {
+		
 		// Check if we got a modal window showing
 		if( isModalWindow() ) {
 			// We are showing a modal window lets render it..
@@ -197,6 +204,12 @@ public class NetHackWindowManager implements NetHackRenderer {
 				} while( it.hasNext() );
 			}			
 		}
+		
+		// Render string
+		gl.glPushMatrix();
+			gl.glTranslatef(0,0,-6);
+			FontAtlasTexture.render(gl,"Hellu world!");
+		gl.glPopMatrix();
 	}
 	
 }
