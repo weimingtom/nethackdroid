@@ -21,5 +21,6 @@ package se.dinamic.nethack;
 public interface NetHackWindow extends NetHackRenderer {
 	public void handleGlyph(int x,int y, int glyph);
 	public void display(int flag);
+	public void destroy();
 	public void putStr(int attr,String str);
 }

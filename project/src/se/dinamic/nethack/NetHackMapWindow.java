@@ -36,6 +36,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 	private NetHackTileAtlas _atlas;
+	private boolean _isDisplayed=false;
 	
 	private static float PLANE_VERTICES[] = {
 		-0.5f, -0.5f,  0.0f,	// Image plane
@@ -65,58 +66,59 @@ public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 		_atlas=atlas;
 	}
 	
-	public void display(int flag) {};
+	public void display(int flag) { _isDisplayed = true; };
+	public void destroy() { };
+	
 	public void putStr(int attr,String str) {};
 	
 	public void init(GL10 gl) {}
 	
 	public void render(GL10 gl) {
-		//Log.v(NetHack.LOGTAG,"RENDER()");
-		
-		// Translate map so its centered on player
-		gl.glTranslatef(-_playerX,-_playerY,0);
-		
-		// Get tile texture coords
-		//_atlas.generateTextureCoords(1,_planeTextureCoords);
-		
-		gl.glPushMatrix();
-		gl.glEnable(GL10.GL_TEXTURE_2D);
-		gl.glBindTexture(GL10.GL_TEXTURE_2D,_atlas.texture());
-		
-		// Run thru all entries in map and render tile
-		int tile=-1;
-		
-		lock();	// Lock the map
-		Iterator<Entry> it = get().iterator();
-		int glyph=0;
-		if( it.hasNext() ) {		
-			float current_x=0;
-			float current_y=0;
-			do {
-				Entry<NetHackMap.Position,Integer> e = it.next();
-				
-				glyph = e.getValue();
-				
-				if( tile != LibNetHack.glyph2tile(glyph) ) {
-					tile = LibNetHack.glyph2tile(glyph);
-					_atlas.generateTextureCoords(tile,_planeTextureCoords);
-				}
-				
-				// move to map location
-				NetHackMap.Position p=e.getKey();
-				gl.glTranslatef(p.getX()-current_x,p.getY()-current_y,0);
-				
-				// Render tile
-				gl.glTexCoordPointer(2, gl.GL_FLOAT, 0, _planeTextureCoords);
-				gl.glVertexPointer(3, gl.GL_FLOAT, 0, _planeVertices);
-				gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, 4 );
-				
-				current_x=p.getX();
-				current_y=p.getY();
-		
-			} while( it.hasNext() );
-		}	
-		unlock();	// Unlock the map
-		gl.glPopMatrix();
+		if( _isDisplayed ) {
+			// Translate map so its centered on player
+			gl.glTranslatef(-_playerX,-_playerY,0);
+
+			gl.glPushMatrix();
+			
+			
+			gl.glEnable(GL10.GL_TEXTURE_2D);
+			gl.glBindTexture(GL10.GL_TEXTURE_2D,_atlas.texture());
+			
+			// Run thru all entries in map and render tile
+			int tile=-1;
+			
+			lock();	// Lock the map
+			Iterator<Entry> it = get().iterator();
+			int glyph=0;
+			if( it.hasNext() ) {		
+				float current_x=0;
+				float current_y=0;
+				do {
+					Entry<NetHackMap.Position,Integer> e = it.next();
+					
+					glyph = e.getValue();
+					
+					if( tile != LibNetHack.glyph2tile(glyph) ) {
+						tile = LibNetHack.glyph2tile(glyph);
+						_atlas.generateTextureCoords(tile,_planeTextureCoords);
+					}
+					
+					// move to map location
+					NetHackMap.Position p=e.getKey();
+					gl.glTranslatef(p.getX()-current_x,p.getY()-current_y,0);
+					
+					// Render tile
+					gl.glTexCoordPointer(2, gl.GL_FLOAT, 0, _planeTextureCoords);
+					gl.glVertexPointer(3, gl.GL_FLOAT, 0, _planeVertices);
+					gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, 4 );
+					
+					current_x=p.getX();
+					current_y=p.getY();
+			
+				} while( it.hasNext() );
+			}	
+			unlock();	// Unlock the map
+			gl.glPopMatrix();
+		}
 	}
 }

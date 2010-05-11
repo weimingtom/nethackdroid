@@ -79,7 +79,21 @@ public class NetHackWindowManager implements NetHackRenderer {
 	}
 	
 	public void handleGlyph(int winid, int x, int y, int glyph) {
-		_windows.get(winid).window.handleGlyph(x,y,glyph);
+		if( _windows.containsKey(winid) )
+			_windows.get(winid).window.handleGlyph(x,y,glyph);
+	}
+	
+	public void display(int winid, int flag ) {
+		//Log.d(NetHack.LOGTAG,"NetHackWindowManager.display() display window "+winid+" flag "+flag+".");
+		if( _windows.containsKey(winid) )
+			_windows.get(winid).window.display(flag);
+	}
+	
+	public void destroy(int winid) {
+		if( _windows.containsKey(winid) ) {
+			_windows.get(winid).window.destroy();
+			_windows.remove(_windows.get(winid));
+		}
 	}
 	
 	public int create( int type ) {
@@ -96,9 +110,23 @@ public class NetHackWindowManager implements NetHackRenderer {
 			} break;
 			
 			case NHW_MESSAGE: 
+			{
+				Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() creating message window.");
+			} break;
 			case NHW_STATUS:
+			{
+				Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() creating status window.");
+			} break;
 			case NHW_MENU:
+			{
+				Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() creating menu window.");
+			} break;
 			case NHW_TEXT:
+			{
+				Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() creating text window.");
+				NetHackTextWindow tw=new NetHackTextWindow(_resources);
+				_windows.put(winid,new Window(winid,type,tw));
+			} break;
 			default:
 				
 			break;
@@ -106,13 +134,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 		return winid;
 	}
 	
-	public void display(int winid, int flag ) {
-		Log.d(NetHack.LOGTAG,"NetHackWindowManager.display() display window "+winid+" flag "+flag+".");
-	}
 	
-	public void destroy(int winid) {
-		
-	}
 	
 	/** Check if winid exists */
 	private boolean exists(int winid) {

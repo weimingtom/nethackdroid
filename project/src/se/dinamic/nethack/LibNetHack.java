@@ -47,6 +47,7 @@ public abstract class LibNetHack {
     abstract void onPrintGlyph(int winid,int x,int y,int glyph);
     abstract int onCreateWindow(int type);
     abstract void onDisplayWindow(int winid,int flag);
+    abstract void onDestroyWindow(int winid);
     
      // Dispatch callbacks
      public static void dispatch_init_nhwindows() { if(_instance!=null) _instance.onInitWindows(); }
@@ -56,6 +57,7 @@ public abstract class LibNetHack {
      public static void dispatch_print_glyph(int winid,int x,int y,int glyph) { if(_instance!=null) _instance.onPrintGlyph(winid,x,y,glyph);}
      public static int dispatch_create_nhwindow(int type) {if(_instance!=null) return _instance.onCreateWindow(type); return 0; }
      public static void dispatch_display_nhwindow(int winid,int flag) { if(_instance!=null) _instance.onDisplayWindow(winid,flag); }
+     public static void dispatch_destroy_nhwindow(int winid) { if(_instance!=null) _instance.onDestroyWindow(winid); }
      
      
      
