@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.Random;
 import javax.microedition.khronos.opengles.GL10;
 import android.content.res.Resources;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class NetHackWindowManager implements NetHackRenderer {
 	/** NetHack message window type... */
@@ -39,7 +40,6 @@ public class NetHackWindowManager implements NetHackRenderer {
 	/** NetHack text window type... */
 	public static final int NHW_TEXT=5;
 
-	
 	/** Internal Window class */
 	private class Window {
 		public final int id;
@@ -58,6 +58,9 @@ public class NetHackWindowManager implements NetHackRenderer {
 	private LinkedHashMap<Integer,Window> _windows;
 	private java.util.Random _random;
 	private Resources _resources;
+	
+	private final ReentrantLock _modalLock = new ReentrantLock();
+	private Window _modalWindow = null;
 	
 	/** Preloaded tileset form resource.. */
 	private NetHackTileAtlas _tileset;
@@ -125,7 +128,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 			{
 				Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() creating text window.");
 				NetHackTextWindow tw=new NetHackTextWindow(_resources);
-				_windows.put(winid,new Window(winid,type,tw));
+				doModalWindow( new Window(winid,type,tw) );
 			} break;
 			default:
 				
@@ -134,6 +137,26 @@ public class NetHackWindowManager implements NetHackRenderer {
 		return winid;
 	}
 	
+	private void doModalWindow(Window w) {
+		_modalLock.lock();
+		_modalWindow = w;
+		while( isModalWindow() ) {
+			try {
+				Thread.sleep(500);
+			} catch (java.lang.InterruptedException e) {
+			}
+		}
+	}
+	
+	public void endModalWindow() {
+		if( isModalWindow() ) {
+			_modalLock.unlock();
+		}
+	}
+	
+	public boolean isModalWindow() {
+		return _modalLock.isLocked();
+	}
 	
 	
 	/** Check if winid exists */
@@ -157,17 +180,23 @@ public class NetHackWindowManager implements NetHackRenderer {
 	}
 	
 	public void render(GL10 gl) {
-		// Run thru all window and render them...
-		Set ws=_windows.entrySet();
-		Iterator<Entry> it = ws.iterator();
-		if( it.hasNext() ) {			
-			do {
-				Entry<Integer,Window> e = it.next();
-				Window w = e.getValue();
-				// render the window..
-				w.window.render( gl );
-			} while( it.hasNext() );
-		}			
+		// Check if we got a modal window showing
+		if( isModalWindow() ) {
+			// We are showing a modal window lets render it..
+			_modalWindow.window.render( gl );
+		} else {
+			// Run thru all window and render them...
+			Set ws=_windows.entrySet();
+			Iterator<Entry> it = ws.iterator();
+			if( it.hasNext() ) {			
+				do {
+					Entry<Integer,Window> e = it.next();
+					Window w = e.getValue();
+					// render the window..
+					w.window.render( gl );
+				} while( it.hasNext() );
+			}			
+		}
 	}
 	
 }
