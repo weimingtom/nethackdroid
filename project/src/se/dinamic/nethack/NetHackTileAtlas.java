@@ -33,9 +33,9 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class NetHackTileAtlas {
 	
-	private final static int TILE_SIZE=32;
-	private final static int ATLAS_WIDTH=1280;
-	private final static int ATLAS_HEIGHT=960;
+	private final static int TILE_SIZE=16;
+	private final static int ATLAS_WIDTH=640;
+	private final static int ATLAS_HEIGHT=480;
 	private final static int ATLAS_BYTES_PER_PIXEL=4;
 	private final static int ATLAS_PIXELFORMAT = GL10.GL_RGBA;
 	
@@ -44,6 +44,7 @@ public class NetHackTileAtlas {
 	private ByteBuffer _bitmapdata;
 	
 	public static NetHackTileAtlas createFromResource(Resources resources,  int resid) {
+		Log.d(NetHack.LOGTAG,"NetHackTileAtlas.createFromResource() Create atlas from resource.");
 		NetHackTileAtlas atlas=new NetHackTileAtlas();
 		atlas.loadFromResource(resources,resid);
 		return atlas;
@@ -51,25 +52,27 @@ public class NetHackTileAtlas {
 	
 	private void loadFromResource(Resources resources,int id) {
 		//Resources resources = context.getResources();
+		Log.d(NetHack.LOGTAG,"NetHackTileAtlas.loadFromResource() Decode and get bitmapdata.");
 		Bitmap bmp = BitmapFactory.decodeResource( resources, id );
 		Bitmap realbmp = bmp.copy(Config.ARGB_8888, false);
 		
 		getBitmapData(realbmp);
 		bmp.recycle();
 		realbmp.recycle();
+		Log.d(NetHack.LOGTAG,"NetHackTileAtlas.loadFromResource() finished.");
 	}
 	
 	public void generate(GL10 gl) {
-		Log.v( "NetHackTileAtlas", "Generating texture");
+		Log.d(NetHack.LOGTAG,"NetHackTileAtlas.generate() Generate GL texture of bitmapdata.");
 		// Allocate empty atlas texture
 		_texture = new int[1];
 		gl.glGenTextures( 1, _texture, 0); 
-		Log.v( "NetHackTileAtlas", "_texture="+_texture[0]);
 		
 		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
 		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR); 
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, _texture[0] );
 		gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, ATLAS_WIDTH, ATLAS_HEIGHT, 0, ATLAS_PIXELFORMAT, GL10.GL_UNSIGNED_BYTE, _bitmapdata);
+		Log.d(NetHack.LOGTAG,"NetHackTileAtlas.generate() finished.");
 	}
 	
 	public void generateTextureCoords( int index, FloatBuffer textureCoords ) {
@@ -79,7 +82,7 @@ public class NetHackTileAtlas {
 		float yoffset = (1.0f / ( ATLAS_HEIGHT / TILE_SIZE ) ) * rows;
 		float xsize = (1.0f / ( ATLAS_WIDTH / TILE_SIZE ) );
 		float ysize = (1.0f / ( ATLAS_HEIGHT / TILE_SIZE ) );
-		// Log.v( "TextureAtlas", "generateTextureCoords() index"+index+" rows: "+rows+" cols: "+cols +" "+xoffset+","+yoffset+" - "+(xoffset+xsize)+","+ (yoffset+ysize));
+		// Log.d( "TextureAtlas", "generateTextureCoords() index"+index+" rows: "+rows+" cols: "+cols +" "+xoffset+","+yoffset+" - "+(xoffset+xsize)+","+ (yoffset+ysize));
 		
 		textureCoords.put( 0, xoffset);			textureCoords.put( 1, yoffset + ysize ); 
 		textureCoords.put( 2, xoffset + xsize );		textureCoords.put( 3, yoffset + ysize ); 
@@ -119,6 +122,7 @@ public class NetHackTileAtlas {
 		}
 		_bitmapdata.position(0);
 	} 
+	
 	private NetHackTileAtlas() {
 		
 	}

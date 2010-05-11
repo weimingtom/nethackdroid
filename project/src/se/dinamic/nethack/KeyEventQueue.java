@@ -33,6 +33,7 @@ public class KeyEventQueue {
     /** This will block until queue have an key event to fetch */
     public int getKey() {
         while(true) {
+	    Log.d(NetHack.LOGTAG,"KeyEventQueue.getKey() getting key from queue...");
             try {
                 return _queue.take();
             } catch (java.lang.InterruptedException e) {
@@ -42,7 +43,7 @@ public class KeyEventQueue {
     
     /** Add a key to the queue */
     public void addKey(int keysym) {
-        int key=0;
+	int key=0;
         try {
             switch(keysym) {
                 /*
@@ -81,8 +82,10 @@ public class KeyEventQueue {
             }
             
             // Add key to queue
-            if(key!=0)
+            if(key!=0) {
+	        Log.d(NetHack.LOGTAG,"KeyEventQueue.addKey() adding key "+keysym+" to queue...");
                 _queue.put(key);
+	    }
             
         } catch (InterruptedException e) {
         }

@@ -73,16 +73,22 @@ public class NetHackWindowManager implements NetHackRenderer {
 		
 	}
 	
+	public void putStr(int winid,int attr, String str) {
+		//_windows.get(winid).window.putStr(attr,str);
+		Log.d(NetHack.LOGTAG,"NetHackWindowManager.putStr() window "+winid+" attributes "+attr+": '"+str+"'");
+	}
+	
 	public void handleGlyph(int winid, int x, int y, int glyph) {
 		_windows.get(winid).window.handleGlyph(x,y,glyph);
 	}
 	
 	public int create( int type ) {
 		int winid = generateWindowID();
+		Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() new window"+winid);
 		switch(type) {
 			case NHW_MAP:
 			{
-				Log.v(NetHack.LOGTAG,"NetHackWindowManager.create() creating map window.");
+				Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() creating map window.");
 				// Intiialize map renderer
 				_mapWindow = new NetHackMapWindow();
 				_windows.put(winid,new Window(winid,type,_mapWindow));
@@ -101,7 +107,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 	}
 	
 	public void display(int winid, int flag ) {
-		Log.v(NetHack.LOGTAG,"NetHackWindowManager.display() display window "+winid+" flag "+flag+".");
+		Log.d(NetHack.LOGTAG,"NetHackWindowManager.display() display window "+winid+" flag "+flag+".");
 	}
 	
 	public void destroy(int winid) {
@@ -122,8 +128,8 @@ public class NetHackWindowManager implements NetHackRenderer {
 	
 	
 	public void init(GL10 gl) {
-		Log.v(NetHack.LOGTAG,"NetHackWindowManager.init() Intialize window manager renderer.");
-		_tileset = NetHackTileAtlas.createFromResource(_resources,R.drawable.absurd32);
+		Log.d(NetHack.LOGTAG,"NetHackWindowManager.init() Intialize window manager renderer.");
+		_tileset = NetHackTileAtlas.createFromResource(_resources,R.drawable.absurd16);
 		_tileset.generate( gl );
 		_mapWindow.setTileset(_tileset);
 	}
