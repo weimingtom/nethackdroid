@@ -89,6 +89,8 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
     
     public void onDisplayWindow(int winid,int flag) { _wm.display( winid, flag ); }
     
+    public void onDestroyWindow(int winid) { _wm.destroy( winid ); }
+    
     /**
      *  implementation of View.onKeyListener 
      */

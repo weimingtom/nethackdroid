@@ -44,7 +44,7 @@ int _nhjni_proxy_nh_poskey(int *x, int *y, int *mod);
 void _nhjni_proxy_print_glyph(int winid,int x,int y,int glyph);
 void _nhjni_proxy_display_nhwindow(int winid,int flag);
 int _nhjni_proxy_create_nhwindow(int type);
-
+void _nhjni_proxy_destroy_nhwindow(int winid);
 
 void choose_windows(const char *s) {}
 void more() {}
@@ -58,6 +58,7 @@ enum {
   JNI_CALLBACK_INIT_NHWINDOWS=0,
   JNI_CALLBACK_CREATE_NHWINDOW,
   JNI_CALLBACK_DISPLAY_NHWINDOW,
+  JNI_CALLBACK_DESTROY_NHWINDOW,
   JNI_CALLBACK_PUTSTR,
   JNI_CALLBACK_PRINTGLYPH,
   JNI_CALLBACK_RAWPRINT,
@@ -84,7 +85,7 @@ struct window_procs _nhjni_proxy_procs = {
     _nhjni_proxy_create_nhwindow,						// nhjni_proxy_create_nhwindow,
     donull,						// nhjni_proxy_clear_nhwindow,
     _nhjni_proxy_display_nhwindow,	// nhjni_proxy_display_nhwindow,
-    donull,						// nhjni_proxy_destroy_nhwindow,
+    _nhjni_proxy_destroy_nhwindow,	       // nhjni_proxy_destroy_nhwindow,
     donull,						// nhjni_proxy_curs,
     _nhjni_proxy_putstr,			// nhjni_proxy_putstr,
     donull,						// nhjni_proxy_display_file,
@@ -153,6 +154,10 @@ void  _nhjni_proxy_init_nhwindows(int argc,char **argv) {
   flags.initrace = pick_race(flags.initrole, flags.initgend, flags.initalign, PICK_RANDOM);
   flags.initgend = pick_gend(flags.initrole, flags.initrace, flags.initalign, PICK_RANDOM);
   flags.initalign = pick_align(flags.initrole, flags.initrace, flags.initgend, PICK_RANDOM);
+}
+
+void _nhjni_proxy_destroy_nhwindow(int winid) {
+  (*_nhjni_env)->CallStaticVoidMethod(_nhjni_env,_nhjni_cls, jni_callback_methods[JNI_CALLBACK_DESTROY_NHWINDOW], winid);
 }
 
 void _nhjni_proxy_raw_print(const char *str) { 
@@ -296,6 +301,7 @@ void * _nethack_thread_proc(void *data) {
     jni_callback_methods[JNI_CALLBACK_INIT_NHWINDOWS] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_init_nhwindows", "()V");
     jni_callback_methods[JNI_CALLBACK_CREATE_NHWINDOW] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_create_nhwindow", "(I)I");
     jni_callback_methods[JNI_CALLBACK_DISPLAY_NHWINDOW] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_display_nhwindow", "(II)V");
+    jni_callback_methods[JNI_CALLBACK_DESTROY_NHWINDOW] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_destroy_nhwindow", "(I)V");
     jni_callback_methods[JNI_CALLBACK_PUTSTR] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_putstr", "(IILjava/lang/String;)V");
     jni_callback_methods[JNI_CALLBACK_PRINTGLYPH] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_print_glyph", "(IIII)V");
     jni_callback_methods[JNI_CALLBACK_RAWPRINT] = (*_nhjni_env)->GetStaticMethodID(_nhjni_env,_nhjni_cls, "dispatch_raw_print", "(Ljava/lang/String;)V");
