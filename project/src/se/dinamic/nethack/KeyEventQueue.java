@@ -48,14 +48,14 @@ public class KeyEventQueue {
                 /*
                  * NAVIGATION KEY MAPPING
                  */
-                case KeyEvent.KEYCODE_K:
+                case KeyEvent.KEYCODE_J:
                 case KeyEvent.KEYCODE_DPAD_UP:
-                    key = 'k' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
+                    key = 'J' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
                 break;
                 
-                case KeyEvent.KEYCODE_J:
+                case KeyEvent.KEYCODE_K:
                 case KeyEvent.KEYCODE_DPAD_DOWN:
-                    key = 'j' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
+                    key = 'k' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
                 break;
                 
                 case KeyEvent.KEYCODE_H:

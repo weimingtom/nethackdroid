@@ -27,7 +27,7 @@ import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class NetHackMapRenderer extends NetHackMap implements NetHackRenderer{
+public class NetHackMapWindow extends NetHackMap implements NetHackWindow{
 	private NetHackTileAtlas _atlas;
 	private static float PLANE_VERTICES[] = {
 		-0.5f, -0.5f,  0.0f,	// Image plane
@@ -46,7 +46,7 @@ public class NetHackMapRenderer extends NetHackMap implements NetHackRenderer{
 	public FloatBuffer _planeVertices;
 	public FloatBuffer _planeTextureCoords;
 	
-	public NetHackMapRenderer() {
+	public NetHackMapWindow() {
 		// Setup tile object
 		_planeVertices 		= FloatBuffer.wrap( PLANE_VERTICES, 0, PLANE_VERTICES.length  );
 		_planeTextureCoords	= FloatBuffer.wrap( PLANE_TEXTURE_COORDS, 0, PLANE_TEXTURE_COORDS.length );
@@ -55,6 +55,8 @@ public class NetHackMapRenderer extends NetHackMap implements NetHackRenderer{
 	public void setTileset(NetHackTileAtlas atlas) {
 		_atlas=atlas;
 	}
+	
+	public void init(GL10 gl) {}
 	
 	public void render(GL10 gl) {
 		

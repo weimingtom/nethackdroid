@@ -31,28 +31,22 @@ import android.opengl.GLSurfaceView;
 public class NetHackEngine extends LibNetHack implements View.OnKeyListener
 {
     private Activity _context;
-    private NetHackView _view;
     private KeyEventQueue _keyevent;
-    private java.util.Random _random;
+    private NetHackView _view;
+    private NetHackWindowManager _wm;
     
-    private NetHackMapRenderer _map;
-	
     public NetHackEngine(Activity context) 
    {
 	_context=context;
-	   // Setup view
-	_view=new NetHackView(context);
-	NetHackTileAtlas tileset = _view.loadTileset(R.drawable.absurd32);
-       _map=new NetHackMapRenderer();
-	_map.setTileset(tileset);
-	
+	// Setup view
+	_wm = new NetHackWindowManager(context.getResources());
+	_view = new NetHackView(context);
 	_keyevent = new KeyEventQueue();
          
-	  
-	_view.addRenderer(_map);
+	_view.addRenderer( _wm );
 	   
 	_view.setOnKeyListener(this);
-        _random=new java.util.Random();
+        
    }	   
     
    public GLSurfaceView getView() {
@@ -87,14 +81,13 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
     
     public void onPutStr(int winid,int attr,String status) { }
     
-    public void onPrintGlyph(int winid,int x,int y,int glyph) { _map.handleGlyph(x,y,glyph); }
+    public void onPrintGlyph(int winid,int x,int y,int glyph) { _wm.handleGlyph( winid, x, y, glyph ); }
    
     public int onGetKey() { return _keyevent.getKey(); }
    
-    public int onCreateWindow(int type) { return 1+(_random.nextInt()%50); }
+    public int onCreateWindow(int type) {  return _wm.create( type ); }
     
-    public void onDisplayWindow(int winid,int flag) {
-    }
+    public void onDisplayWindow(int winid,int flag) { _wm.display( winid, flag ); }
     
     /**
      *  implementation of View.onKeyListener 
