@@ -18,10 +18,17 @@
 
 package se.dinamic.nethack;
 
+import java.util.Set;
+import java.util.Map.Entry;
+import java.util.Iterator;
+
 import java.nio.ShortBuffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+
+import android.util.Log;
+
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -51,6 +58,7 @@ public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 		// Setup tile object
 		_planeVertices 		= FloatBuffer.wrap( PLANE_VERTICES, 0, PLANE_VERTICES.length  );
 		_planeTextureCoords	= FloatBuffer.wrap( PLANE_TEXTURE_COORDS, 0, PLANE_TEXTURE_COORDS.length );
+		
 	}
 	
 	public void setTileset(NetHackTileAtlas atlas) {
@@ -63,41 +71,52 @@ public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 	public void init(GL10 gl) {}
 	
 	public void render(GL10 gl) {
-
+		//Log.v(NetHack.LOGTAG,"RENDER()");
+		
 		// Translate map so its centered on player
 		gl.glTranslatef(-_playerX,-_playerY,0);
 		
-		
 		// Get tile texture coords
-		FloatBuffer _tile_tcarr=FloatBuffer.allocate(8);
-		_atlas.generateTextureCoords(1,_tile_tcarr);
-		
+		//_atlas.generateTextureCoords(1,_planeTextureCoords);
 		
 		gl.glPushMatrix();
 		gl.glEnable(GL10.GL_TEXTURE_2D);
 		gl.glBindTexture(GL10.GL_TEXTURE_2D,_atlas.texture());
+		
 		// Run thru all entries in map and render tile
 		int tile=-1;
-		for(int y=0;y<NetHackMap.SIZE;y++) {
-			// Translate into y 
-			gl.glTranslatef(0,1,0);
-			for(int x=0;x<NetHackMap.SIZE;x++) {
-				gl.glTranslatef(1,0,0);
-			
-				int glyph=get(x,y);
-				if(  glyph != 0 ) {
-					if( tile != LibNetHack.glyph2tile(glyph) ) {
-						tile = LibNetHack.glyph2tile(glyph);
-						_atlas.generateTextureCoords(tile,_tile_tcarr);
-					}
-					// Render the texturemapped tile
-					gl.glTexCoordPointer(2, gl.GL_FLOAT, 0, _tile_tcarr);
-					gl.glVertexPointer(3, gl.GL_FLOAT, 0, _planeVertices);
-					gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, 4 );
+		
+		lock();	// Lock the map
+		Iterator<Entry> it = get().iterator();
+		int glyph=0;
+		if( it.hasNext() ) {		
+			float current_x=0;
+			float current_y=0;
+			do {
+				Entry<NetHackMap.Position,Integer> e = it.next();
+				
+				glyph = e.getValue();
+				
+				if( tile != LibNetHack.glyph2tile(glyph) ) {
+					tile = LibNetHack.glyph2tile(glyph);
+					_atlas.generateTextureCoords(tile,_planeTextureCoords);
 				}
-			}
-			gl.glTranslatef(-NetHackMap.SIZE,0,0);
-		}
+				
+				// move to map location
+				NetHackMap.Position p=e.getKey();
+				gl.glTranslatef(p.getX()-current_x,p.getY()-current_y,0);
+				
+				// Render tile
+				gl.glTexCoordPointer(2, gl.GL_FLOAT, 0, _planeTextureCoords);
+				gl.glVertexPointer(3, gl.GL_FLOAT, 0, _planeVertices);
+				gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, 4 );
+				
+				current_x=p.getX();
+				current_y=p.getY();
+		
+			} while( it.hasNext() );
+		}	
+		unlock();	// Unlock the map
 		gl.glPopMatrix();
 	}
 }
