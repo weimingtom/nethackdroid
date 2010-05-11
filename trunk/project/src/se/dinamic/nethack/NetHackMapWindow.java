@@ -28,14 +28,14 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import android.util.Log;
-
+import android.content.res.Resources;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
-	private NetHackTileAtlas _atlas;
+	private static NetHackTileAtlas _atlas;
 	private boolean _isDisplayed=false;
 	
 	private static float PLANE_VERTICES[] = {
@@ -62,9 +62,11 @@ public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 		
 	}
 	
-	public void setTileset(NetHackTileAtlas atlas) {
-		_atlas=atlas;
+	public static void initialize(GL10 gl,Resources resources) {
+		_atlas = NetHackTileAtlas.createFromResource(resources,R.drawable.absurd16);
+		_atlas.generate(gl);
 	}
+	
 	
 	public void display(int flag) { _isDisplayed = true; };
 	public void destroy() { };

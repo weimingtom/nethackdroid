@@ -23,7 +23,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class NetHackTextWindow implements NetHackWindow {
 	private boolean _isDisplayed=false;
-	Resources _resources;
 	
 	private static float PLANE_VERTICES[] = {
 		-0.5f, -0.5f,  0.0f,	// Image plane
@@ -39,15 +38,21 @@ public class NetHackTextWindow implements NetHackWindow {
 		1.0f, 0.0f
 	};
 	
-	public FloatBuffer _planeVertices;
-	public FloatBuffer _planeTextureCoords;
+	private FloatBuffer _planeVertices;
+	private FloatBuffer _planeTextureCoords;
+	
+	private  static Texture _paperBackground;
+	private  static Resources _resources;
+	
+	public static void initialize(GL10 gl,Resources resources) {
+		_resources = resources;
+		_paperBackground = Texture.fromResource(gl,resources,R.drawable.paper);
+	}
 	
 	
-	
-	public NetHackTextWindow (Resources resources) {
+	public NetHackTextWindow () {
 		_planeVertices 		= FloatBuffer.wrap( PLANE_VERTICES, 0, PLANE_VERTICES.length  );
 		_planeTextureCoords	= FloatBuffer.wrap( PLANE_TEXTURE_COORDS, 0, PLANE_TEXTURE_COORDS.length );
-		_resources = resources;
 	}
 	
 	public void display(int flag) { _isDisplayed = true; };
@@ -55,16 +60,13 @@ public class NetHackTextWindow implements NetHackWindow {
 	public void putStr(int attr,String str) {};
 	public void handleGlyph(int x,int y,int glyph) {};
 	
-	public void init(GL10 gl) {
-		// If not loaded load the background texture  for this window..
-		
-	}
+	public void init(GL10 gl) { }
 	
 	public void render(GL10 gl) {
 		if( _isDisplayed ) {
 			gl.glPushMatrix();
-				//gl.glBindTexture(GL10.GL_TEXTURE_2D,_atlas.texture());
-				//gl.glTexCoordPointer(2, gl.GL_FLOAT, 0, _planeTextureCoords);
+				gl.glBindTexture(GL10.GL_TEXTURE_2D,_paperBackground.texture());
+				gl.glTexCoordPointer(2, gl.GL_FLOAT, 0, _planeTextureCoords);
 				gl.glVertexPointer(3, gl.GL_FLOAT, 0, _planeVertices);
 				gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, 4 );
 			gl.glPopMatrix();
