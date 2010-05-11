@@ -80,48 +80,57 @@ public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 			// Move camera back 10 units..
 			gl.glTranslatef(0,0,-10);
 
-			// Translate map so its centered on player
+			// Translate map so its centered on know player position
 			gl.glTranslatef(-_playerX,-_playerY,0);
 
+			// Ensure texture is enabled and bound
 			gl.glEnable(GL10.GL_TEXTURE_2D);
 			gl.glBindTexture(GL10.GL_TEXTURE_2D,_atlas.texture());
 			
 			// Run thru all entries in map and render tile
 			int tile=-1;
 			
-			lock();	// Lock the map
+			// Lock the map, prevents updates change
+			lock();	
+
+			// Let's get all map items and render them
 			Iterator<Entry> it = get().iterator();
 			int glyph=0;
 			if( it.hasNext() ) {		
-				
-				float current_x = 0;
-				float current_y = 0;
-				
+			
 				do {
 					Entry<NetHackMap.Position,Integer> e = it.next();
 					
+					// Get map glyph and convert it to tile
 					glyph = e.getValue();
-					
 					if( tile != LibNetHack.glyph2tile(glyph) ) {
 						tile = LibNetHack.glyph2tile(glyph);
+						// New tile let's get texture coordinates from tileset atlas
 						_atlas.generateTextureCoords(tile,_planeTextureCoords);
 					}
 					
-					// move to map location
+					// Use the tracked translation to calculate a translation offset
+					// to this map object..
+					
 					NetHackMap.Position p=e.getKey();
-					gl.glTranslatef(p.getX()-current_x,p.getY()-current_y,0);
 					
-					// Render tile
-					gl.glTexCoordPointer(2, gl.GL_FLOAT, 0, _planeTextureCoords);
-					gl.glVertexPointer(3, gl.GL_FLOAT, 0, _planeVertices);
-					gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, 4 );
-					
-					current_x=p.getX();
-					current_y=p.getY();
+					gl.glPushMatrix();
 			
+						gl.glTranslatef(p.getX(),p.getY(),0);
+						
+						// Render tile textured plane..
+						gl.glTexCoordPointer(2, gl.GL_FLOAT, 0, _planeTextureCoords);
+						gl.glVertexPointer(3, gl.GL_FLOAT, 0, _planeVertices);
+						gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, 4 );
+						
+					gl.glPopMatrix();
+				
 				} while( it.hasNext() );
 			}	
-			unlock();	// Unlock the map
+			
+			// Unlock the map
+			unlock();
+			
 			gl.glPopMatrix();
 		}
 	}
