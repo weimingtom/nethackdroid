@@ -24,7 +24,8 @@ import java.util.Vector;
 
 public class NetHackMessageWindow implements NetHackWindow {
     private boolean _isDisplayed = false;
-    private static final int LOG_ENTRIES=8;
+    private static final int LOG_ENTRIES=40;
+    private static final int DISPLAY_LOG_ENTRIES=6;
     private final java.util.Vector<String> _log=new Vector<String>();
     
     public NetHackMessageWindow() {
@@ -46,7 +47,7 @@ public class NetHackMessageWindow implements NetHackWindow {
     public void render(GL10 gl) {
         if( _isDisplayed ) {
             // Render string
-            
+            float tscale=0.025f;
             // Store Original PROJECTION matrix before changing it
             gl.glMatrixMode( gl.GL_PROJECTION );
             gl.glPushMatrix();
@@ -59,14 +60,23 @@ public class NetHackMessageWindow implements NetHackWindow {
                 gl.glOrthof(0, 1, 0, 1 / ratio, 0.0f, 10.0f);	
             
                 gl.glMatrixMode( gl.GL_MODELVIEW );
-                gl.glTranslatef(0,0,0);
                 gl.glPushMatrix();
                     gl.glLoadIdentity();
-            
-                    gl.glScalef(0.05f,0.05f,0.05f);
-                    for(int i=0;i<_log.size();i++) {
-                        FontAtlasTexture.render( gl, _log.get(i) );
-                        gl.glTranslatef(0,1,0);
+                    gl.glTranslatef(0,1,0);
+                
+                    gl.glScalef(tscale,tscale*ratio,tscale);
+                    // Go down one row
+                    gl.glTranslatef(0,-1,0);
+                    for(int i=0; i < DISPLAY_LOG_ENTRIES; i++) {
+                        
+                        if( i>=_log.size()) 
+                            break;
+                        
+                        int ioffs=i;
+                        if( _log.size() > DISPLAY_LOG_ENTRIES ) 
+                            ioffs = _log.size()-DISPLAY_LOG_ENTRIES + i;
+                        FontAtlasTexture.render( gl, _log.get(ioffs) );
+                        gl.glTranslatef(0,-1,0);
                     }
                 
                 gl.glPopMatrix();
