@@ -79,8 +79,8 @@ public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 		if( _isDisplayed ) {
 			
 			gl.glPushMatrix();
-			// Move camera back 10 units..
-			gl.glTranslatef(0,0,-10);
+			// Move camera back 8 units..
+			gl.glTranslatef(0,0,-5);
 
 			// Translate map so its centered on know player position
 			gl.glTranslatef(-_playerX,-_playerY,0);
