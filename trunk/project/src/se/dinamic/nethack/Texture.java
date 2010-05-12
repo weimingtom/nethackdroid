@@ -58,6 +58,7 @@ public class Texture {
 		return texture;
 	}
 	
+	/** Load resource texture from cache. */
 	public static ByteBuffer readCache(int resid) {
 		File f = new File("/sdcard/nethackdata/cache/texture"+resid+".cache");
 		ByteBuffer data;
@@ -78,6 +79,7 @@ public class Texture {
 		return null;
 	}
 	
+	/** Store resource texture from cache. */
 	public static boolean storeCache(int resid,ByteBuffer data) {
 		File f = new File("/sdcard/nethackdata/cache/texture"+resid+".cache");
 		try {
@@ -107,9 +109,10 @@ public class Texture {
 		return texture;
 	}
 	
+	/** Create texture from resource, if the texture exists in cache lets load it from there ..*/
 	public static Texture fromResource( GL10 gl, Resources resources, int id ) {
 		Log.d(NetHack.LOGTAG,"Texture.fromResource() Loading and creating texture.");
-	
+		
 		int gltexture;
 		Texture texture = new Texture( gl );
 		texture.createFromResources( resources, id );
@@ -136,14 +139,32 @@ public class Texture {
 	
 	
 	private void createFromResources( Resources resources, int id ) {
-		// Ensure bitmap is 4 chan 8bit pic
-		Bitmap bmp = BitmapFactory.decodeResource( resources, id );
-		Bitmap realbmp = bmp.copy(Config.ARGB_8888, false);
+		int width=0,height=0;
+		ByteBuffer bb=readCache(id);
 		
-		ByteBuffer bb=Texture.argb2rgba(realbmp); 
-		createFromRGBAByteBuffer( bb, realbmp.getWidth(), realbmp.getHeight() );
-		bmp.recycle();
-		realbmp.recycle();
+		if( bb == null ) {
+			Log.d(NetHack.LOGTAG,"Texture.createFromResources() No cached texture data found, decoding resource.");
+		
+			// Ensure bitmap is 4 chan 8bit pic
+			Bitmap bmp = BitmapFactory.decodeResource( resources, id );
+			Bitmap realbmp = bmp.copy(Config.ARGB_8888, false);
+		
+			bb=Texture.argb2rgba(realbmp); 
+		
+			createFromRGBAByteBuffer( bb, realbmp.getWidth(), realbmp.getHeight() );
+			
+			storeCache(id, bb );
+			
+			bmp.recycle();
+			realbmp.recycle();
+			
+		} else  {
+			Log.d(NetHack.LOGTAG,"Texture.createFromResources() Reusing cached texture data.");
+			BitmapFactory.Options specs=new BitmapFactory.Options();
+			Bitmap bm = BitmapFactory.decodeResource( resources, id, specs);
+			createFromRGBAByteBuffer( bb, specs.outWidth, specs.outHeight );
+			
+		}
 			
 	}
 	

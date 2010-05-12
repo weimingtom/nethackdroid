@@ -38,9 +38,9 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class NetHackTileAtlas {
 	
-	private final static int TILE_SIZE=16;
-	private final static int ATLAS_WIDTH=640;
-	private final static int ATLAS_HEIGHT=480;
+	private final static int TILE_SIZE=32;
+	private final static int ATLAS_WIDTH=1280;
+	private final static int ATLAS_HEIGHT=960;
 	private final static int ATLAS_BYTES_PER_PIXEL=4;
 	private final static int ATLAS_PIXELFORMAT = GL10.GL_RGBA;
 	
@@ -48,6 +48,7 @@ public class NetHackTileAtlas {
 	private int _texture[];
 	private ByteBuffer _bitmapdata;
 	
+	/** Create tileset atlas texture from resources */
 	public static NetHackTileAtlas createFromResource(Resources resources,  int resid) {
 		Log.d(NetHack.LOGTAG,"NetHackTileAtlas.createFromResource() Create atlas from resource.");
 		NetHackTileAtlas atlas=new NetHackTileAtlas();
@@ -56,9 +57,7 @@ public class NetHackTileAtlas {
 	}
 	
 	private void loadFromResource(Resources resources,int id) {
-		//Resources resources = context.getResources();
 		Log.d(NetHack.LOGTAG,"NetHackTileAtlas.loadFromResource() Decode and get bitmapdata.");
-		
 		
 		// Check if we can get texture from cache
 		_bitmapdata = Texture.readCache(id);

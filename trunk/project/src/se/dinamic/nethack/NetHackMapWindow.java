@@ -63,7 +63,7 @@ public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 	}
 	
 	public static void initialize(GL10 gl,Resources resources) {
-		_atlas = NetHackTileAtlas.createFromResource(resources,R.drawable.absurd16);
+		_atlas = NetHackTileAtlas.createFromResource(resources,R.drawable.absurd32);
 		_atlas.generate(gl);
 	}
 	
