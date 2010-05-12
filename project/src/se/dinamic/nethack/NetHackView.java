@@ -41,7 +41,8 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
         setFocusableInTouchMode( true );
         setRenderer( this );
 	    
-	FontAtlasTexture._typeFace = Typeface.createFromAsset(context.getAssets(), "fonts/Isabella.ttf") ;
+	//FontAtlasTexture._typeFace = Typeface.createFromAsset(context.getAssets(), "fonts/Isabella.ttf") ;
+	FontAtlasTexture._typeFace = Typeface.create(Typeface.SANS_SERIF,Typeface.NORMAL);
     }
     
     
@@ -100,6 +101,9 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
         _gl = gl;
         gl.glViewport(0, 0, width, height);
         
+	NetHackWindowManager.screenWidth = width;
+	NetHackWindowManager.screenHeight = height;
+	    
         // Calculate new projection matrix on viewport dimension change
         float ratio = (float) width / height;
         gl.glMatrixMode(GL10.GL_PROJECTION);
