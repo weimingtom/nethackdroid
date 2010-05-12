@@ -30,6 +30,14 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.io.InputStream;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.WritableByteChannel;
+import java.nio.channels.ReadableByteChannel;
+
 
 import android.util.Log;
 
@@ -50,7 +58,39 @@ public class Texture {
 		return texture;
 	}
 	
+	public static ByteBuffer readCache(int resid) {
+		File f = new File("/sdcard/nethackdata/cache/texture"+resid+".cache");
+		ByteBuffer data;
+		if( f.exists() ) {
+			Log.d(NetHack.LOGTAG,"Texture.readCache() found cached texture "+f.getName());
+			try {
+				// Cached texture data exists let's load it
+				ReadableByteChannel channel = new FileInputStream( f ).getChannel();
+				data = ByteBuffer.allocate((int)f.length());
+				channel.read(data);
+				return data;
+			} catch ( FileNotFoundException e ) {
+				return null;
+			} catch ( IOException e ) {
+				return null;
+			}
+		} 
+		return null;
+	}
 	
+	public static boolean storeCache(int resid,ByteBuffer data) {
+		File f = new File("/sdcard/nethackdata/cache/texture"+resid+".cache");
+		try {
+			Log.d(NetHack.LOGTAG,"Texture.storeCache() storing texture "+f.getName());
+			WritableByteChannel channel = new FileOutputStream( f ).getChannel();
+			channel.write( data );
+		} catch ( FileNotFoundException e ) {
+			return false;
+		} catch ( IOException e ) {
+			return false;
+		}		
+		return true;
+	}
 	
 	public static Texture fromStream( GL10 gl, InputStream stream) {
 		int gltexture;
@@ -100,10 +140,11 @@ public class Texture {
 		Bitmap bmp = BitmapFactory.decodeResource( resources, id );
 		Bitmap realbmp = bmp.copy(Config.ARGB_8888, false);
 		
-		ByteBuffer bb = Texture.argb2rgba(realbmp); 
+		ByteBuffer bb=Texture.argb2rgba(realbmp); 
 		createFromRGBAByteBuffer( bb, realbmp.getWidth(), realbmp.getHeight() );
 		bmp.recycle();
 		realbmp.recycle();
+			
 	}
 	
 	private void createFromBitmap( Bitmap bmp ) {

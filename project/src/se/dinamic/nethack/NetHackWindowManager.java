@@ -207,7 +207,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 		
 		// Render string
 		gl.glPushMatrix();
-			gl.glTranslatef(0,0,-6);
+			gl.glTranslatef(0,0,-3);
 			FontAtlasTexture.render(gl,"Hellu world!");
 		gl.glPopMatrix();
 	}

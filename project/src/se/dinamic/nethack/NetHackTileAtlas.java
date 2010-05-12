@@ -25,10 +25,15 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.content.Context;
 import android.util.Log;
+
+
+
 import java.nio.IntBuffer;
 import java.nio.FloatBuffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+
+
 import javax.microedition.khronos.opengles.GL10;
 
 public class NetHackTileAtlas {
@@ -53,12 +58,24 @@ public class NetHackTileAtlas {
 	private void loadFromResource(Resources resources,int id) {
 		//Resources resources = context.getResources();
 		Log.d(NetHack.LOGTAG,"NetHackTileAtlas.loadFromResource() Decode and get bitmapdata.");
-		Bitmap bmp = BitmapFactory.decodeResource( resources, id );
-		Bitmap realbmp = bmp.copy(Config.ARGB_8888, false);
 		
-		getBitmapData(realbmp);
-		bmp.recycle();
-		realbmp.recycle();
+		
+		// Check if we can get texture from cache
+		_bitmapdata = Texture.readCache(id);
+		
+		if( _bitmapdata == null) { // If we didnt get any buffer from cache lets crate from resource
+		
+			Bitmap bmp = BitmapFactory.decodeResource( resources, id );
+			Bitmap realbmp = bmp.copy(Config.ARGB_8888, false);
+		
+			getBitmapData(realbmp);
+			
+			// Store cached texture
+			Texture.storeCache(id, _bitmapdata);
+			bmp.recycle();
+			realbmp.recycle();
+		}
+		
 		Log.d(NetHack.LOGTAG,"NetHackTileAtlas.loadFromResource() finished.");
 	}
 	
