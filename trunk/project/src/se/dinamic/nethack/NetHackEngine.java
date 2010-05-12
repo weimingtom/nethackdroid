@@ -95,12 +95,14 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
      *  implementation of View.onKeyListener 
      */
     public boolean onKey(View v, int keyCode, KeyEvent event) {
-	if( _wm.isModalWindow() ) {
+	int action=event.getAction();
+	    
+	if(  action == KeyEvent.ACTION_DOWN &&  keyCode==KeyEvent.KEYCODE_DPAD_CENTER && _wm.isModalWindow() ) {
 		// Any key press ends modal window view
 		_wm.endModalWindow();
 	}
 	
-	int action=event.getAction();
+	
 	if( action == KeyEvent.ACTION_DOWN || action ==KeyEvent.ACTION_MULTIPLE)
 		_keyevent.addKey(keyCode);
 	

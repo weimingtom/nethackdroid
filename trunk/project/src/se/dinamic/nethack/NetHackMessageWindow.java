@@ -47,8 +47,8 @@ public class NetHackMessageWindow implements NetHackWindow {
     public void render(GL10 gl) {
         if( _isDisplayed ) {
             // Render string
-            //float tscale=0.025f;
-            float tscale=0.055f;
+            float tscale=0.045f;
+            //float tscale=0.055f;
             // Store Original PROJECTION matrix before changing it
             gl.glMatrixMode( gl.GL_PROJECTION );
             gl.glPushMatrix();

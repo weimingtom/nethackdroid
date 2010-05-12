@@ -51,7 +51,7 @@ public class KeyEventQueue {
                  */
                 case KeyEvent.KEYCODE_J:
                 case KeyEvent.KEYCODE_DPAD_UP:
-                    key = 'J' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
+                    key = 'j' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
                 break;
                 
                 case KeyEvent.KEYCODE_K:
@@ -69,7 +69,7 @@ public class KeyEventQueue {
                     key = 'l' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
                 break;
                 
-                case KeyEvent.KEYCODE_PERIOD:
+                case KeyEvent.KEYCODE_PERIOD: // Reset
                 case KeyEvent.KEYCODE_DPAD_CENTER:
                     key = '.' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
                 break;
@@ -78,7 +78,37 @@ public class KeyEventQueue {
                 case KeyEvent.KEYCODE_BACK:
                     key = 'q' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
                 break;
-                
+		
+		case KeyEvent.KEYCODE_M: // Move far no pickup
+			  key = 'm' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
+		break;
+		
+		case KeyEvent.KEYCODE_G:	// Go until something interesting
+			  key = 'g' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
+		break;
+		
+		case KeyEvent.KEYCODE_F: // Fight in move direction
+			  key = 'f' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
+                break;
+		
+		case KeyEvent.KEYCODE_A: // Apply, use a tool (axe,lamp,key etc...)
+			  key = 'a' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
+                break;
+		
+		case KeyEvent.KEYCODE_C: // Apply, use a tool (axe,lamp,key etc...)
+			  key = 'c' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
+                break;
+		case KeyEvent.KEYCODE_I: // inventory
+			  key = 'i' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
+                break;
+		
+		case KeyEvent.KEYCODE_O: // Open doore
+			  key = 'o' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
+                break;
+		
+		case KeyEvent.KEYCODE_R: // Read
+			  key = 'r' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
+                break;
             }
             
             // Add key to queue

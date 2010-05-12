@@ -63,6 +63,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 	private Resources _resources;
 	
 	private final ReentrantLock _modalLock = new ReentrantLock();
+	private final ReentrantLock _collectionLock = new ReentrantLock();
 	private Window _modalWindow = null;
 	
 	/** Preloaded tileset form resource.. */
@@ -91,8 +92,11 @@ public class NetHackWindowManager implements NetHackRenderer {
 	
 	public void display(int winid, int flag ) {
 		//Log.d(NetHack.LOGTAG,"NetHackWindowManager.display() display window "+winid+" flag "+flag+".");
-		if( _windows.containsKey(winid) )
+		if( _windows.containsKey(winid) ) {
 			_windows.get(winid).window.display(flag);
+			if(_windows.get(winid).type==NHW_TEXT)
+				doModalWindow( _windows.get(winid) );
+		}
 	}
 	
 	public void destroy(int winid) {
@@ -105,6 +109,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 	public int create( int type ) {
 		int winid = generateWindowID();
 		Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() new window"+winid);
+		_collectionLock.lock();
 		switch(type) {
 			case NHW_MAP:
 			{
@@ -133,12 +138,13 @@ public class NetHackWindowManager implements NetHackRenderer {
 			{
 				Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() creating text window.");
 				NetHackTextWindow tw=new NetHackTextWindow();
-				doModalWindow( new Window(winid,type,tw) );
+				_windows.put(winid,new Window(winid,type, tw) );
 			} break;
 			default:
 				
 			break;
 		}
+		_collectionLock.unlock();
 		return winid;
 	}
 	
@@ -198,6 +204,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 			_modalWindow.window.render( gl );
 		} else {
 			// Run thru all window and render them...
+			_collectionLock.lock();
 			Set ws=_windows.entrySet();
 			Iterator<Entry> it = ws.iterator();
 			if( it.hasNext() ) {			
@@ -207,7 +214,8 @@ public class NetHackWindowManager implements NetHackRenderer {
 					// render the window..
 					w.window.render( gl );
 				} while( it.hasNext() );
-			}			
+			}	
+			_collectionLock.unlock();			
 		}
 		
 		
