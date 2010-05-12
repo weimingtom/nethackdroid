@@ -76,7 +76,6 @@ public class NetHackWindowManager implements NetHackRenderer {
 		_resources=resources;
 		_random = new java.util.Random();
 		_windows = new LinkedHashMap<Integer,Window>();
-		
 	}
 	
 	public void putStr(int winid,int attr, String str) {

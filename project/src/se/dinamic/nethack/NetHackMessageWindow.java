@@ -47,7 +47,8 @@ public class NetHackMessageWindow implements NetHackWindow {
     public void render(GL10 gl) {
         if( _isDisplayed ) {
             // Render string
-            float tscale=0.025f;
+            //float tscale=0.025f;
+            float tscale=0.055f;
             // Store Original PROJECTION matrix before changing it
             gl.glMatrixMode( gl.GL_PROJECTION );
             gl.glPushMatrix();
@@ -57,14 +58,17 @@ public class NetHackMessageWindow implements NetHackWindow {
                 gl.glLoadIdentity();
                 // gl.glOrthof(0.0f,parent.getWidth(),0.0f,-parent.getHeight(),0.0f,10.0f);
                 float ratio=NetHackWindowManager.screenWidth/NetHackWindowManager.screenHeight;
-                gl.glOrthof(0, 1, 0, 1 / ratio, 0.0f, 10.0f);	
+		if(ratio > 1.0 ) // Landscape
+			gl.glOrthof(0, 1, 0, 1 / ratio, 0.0f, 10.0f);
+		else // Portrait
+			gl.glOrthof(0, 1 / ratio, 0, 1, 0.0f, 10.0f);
             
                 gl.glMatrixMode( gl.GL_MODELVIEW );
                 gl.glPushMatrix();
                     gl.glLoadIdentity();
                     gl.glTranslatef(0,1,0);
                 
-                    gl.glScalef(tscale,tscale*ratio,tscale);
+                    gl.glScalef((tscale/2.0f),tscale,tscale);
                     // Go down one row
                     gl.glTranslatef(0,-1,0);
                     for(int i=0; i < DISPLAY_LOG_ENTRIES; i++) {
