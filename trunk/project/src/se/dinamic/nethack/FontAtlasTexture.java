@@ -34,9 +34,9 @@ import javax.microedition.khronos.opengles.GL10;
 import java.io.FileNotFoundException;
 
 public class FontAtlasTexture {
-	private static final String CHARACTERS="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.!?'";
+	private static final String CHARACTERS="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.!?'-";
 	private static final int ATLAS_SIZE = 512;
-	private static final int ATLAS_MARGIN = 4;
+	private static final int ATLAS_MARGIN = 8;
 	
 	private static int _texture[];
 	/** The max height of a character in atlas */
@@ -71,16 +71,16 @@ public class FontAtlasTexture {
 		
 		// Get the font metrics
 		Paint.FontMetrics fm = p.getFontMetrics();
-		_characterHeight=Math.abs(fm.top)+Math.abs(fm.leading);
+		_characterHeight=Math.abs(fm.ascent)+Math.abs(fm.descent)+Math.abs(fm.leading);
 		Log.d(NetHack.LOGTAG,"FontAtlasTexture.intialize()  fontmetric height "+_characterHeight);
 		
 		p.setARGB(0xff, 0xff,0xff,0xff);
 		
 		// Let's render all characters in CHARACTERS into the canvas
-		float x=ATLAS_MARGIN,y=ATLAS_MARGIN+Math.abs(fm.top);
+		float x=ATLAS_MARGIN,y=ATLAS_MARGIN+_characterHeight;
 		for(int i=0;i<CHARACTERS.length();i++) {
 			AtlasCharacter ac=new AtlasCharacter();
-			ac.width = p.measureText(CHARACTERS,i,i+1)+4;	
+			ac.width = p.measureText(CHARACTERS,i,i+1);	
 			if( x+ac.width+ATLAS_MARGIN > ATLAS_SIZE ) { 
 				// Character does not fit in the current row
 				// let increase y
@@ -93,13 +93,13 @@ public class FontAtlasTexture {
 			
 			// Set AtlasCharacter values and store it with char key.
 			ac.x=x/ATLAS_SIZE;
-			ac.y=(y-_characterHeight)/ATLAS_SIZE;
+			ac.y=(y-_characterHeight+ATLAS_MARGIN)/ATLAS_SIZE;
 			
 			x+=ac.width;
 			x+=ATLAS_MARGIN;
 			
 			ac.width=ac.width/ATLAS_SIZE;
-			ac.height=_characterHeight/ATLAS_SIZE;
+			ac.height=(_characterHeight+ATLAS_MARGIN)/ATLAS_SIZE;
 			
 			_map.put((int)CHARACTERS.charAt(i), ac);
 			
