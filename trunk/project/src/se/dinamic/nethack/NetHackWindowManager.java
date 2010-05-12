@@ -40,6 +40,9 @@ public class NetHackWindowManager implements NetHackRenderer {
 	/** NetHack text window type... */
 	public static final int NHW_TEXT=5;
 
+	public static int screenWidth;
+	public static int screenHeight;
+	
 	/** Internal Window class */
 	private class Window {
 		public final int id;
@@ -77,8 +80,9 @@ public class NetHackWindowManager implements NetHackRenderer {
 	}
 	
 	public void putStr(int winid,int attr, String str) {
-		//_windows.get(winid).window.putStr(attr,str);
 		Log.d(NetHack.LOGTAG,"NetHackWindowManager.putStr() window "+winid+" attributes "+attr+": '"+str+"'");
+		if( _windows.containsKey(winid) )
+			_windows.get(winid).window.putStr(attr,str);
 	}
 	
 	public void handleGlyph(int winid, int x, int y, int glyph) {
@@ -115,6 +119,8 @@ public class NetHackWindowManager implements NetHackRenderer {
 			case NHW_MESSAGE: 
 			{
 				Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() creating message window.");
+				NetHackMessageWindow mw = new NetHackMessageWindow();
+				_windows.put(winid,new Window(winid,type, mw) );
 			} break;
 			case NHW_STATUS:
 			{
@@ -205,11 +211,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 			}			
 		}
 		
-		// Render string
-		gl.glPushMatrix();
-			gl.glTranslatef(0,0,-3);
-			FontAtlasTexture.render(gl,"Hellu world!");
-		gl.glPopMatrix();
+		
 	}
 	
 }
