@@ -93,7 +93,7 @@ public class FontAtlasTexture {
 			
 			// Set AtlasCharacter values and store it with char key.
 			ac.x=x/ATLAS_SIZE;
-			ac.y=y/ATLAS_SIZE;
+			ac.y=(y-_characterHeight)/ATLAS_SIZE;
 			
 			x+=ac.width;
 			x+=ATLAS_MARGIN;
@@ -141,11 +141,12 @@ public class FontAtlasTexture {
 		// Build u vertex and textcoord arrays to render,
 		FloatBuffer varr = FloatBuffer.allocate((text.length()*9)*3);
 		FloatBuffer tcarr = FloatBuffer.allocate((text.length()*9)*2);
-
+		
 		float x=0;
 		float y=0;
 		int ti=0;
 		int vi=0;
+		
 		for(int i=0;i<text.length();i++) {
 			if( _map.containsKey((int)text.charAt(i)) ) 
 			{
@@ -154,20 +155,21 @@ public class FontAtlasTexture {
 				float cw = 1.0f * (ac.width / _characterWidth);
 				varr.put(vi,x);  varr.put(vi+1,1.0f);  varr.put(vi+2,0.0f);
 				varr.put(vi+3,x);  varr.put(vi+4,0.0f);  varr.put(vi+5,0.0f);
-				varr.put(vi+6,x+ac.width);  varr.put(vi+7,0.0f);  varr.put(vi+8,0.0f);
+				varr.put(vi+6,x+cw);  varr.put(vi+7,0.0f);  varr.put(vi+8,0.0f);
 				
-				varr.put(vi+9,x+ac.width);  varr.put(vi+10,0.0f);  varr.put(vi+11,0.0f);
-				varr.put(vi+12,x+ac.width);  varr.put(vi+13,1.0f);  varr.put(vi+14,0.0f);
+				varr.put(vi+9,x+cw);  varr.put(vi+10,0.0f);  varr.put(vi+11,0.0f);
+				varr.put(vi+12,x+cw);  varr.put(vi+13,1.0f);  varr.put(vi+14,0.0f);
 				varr.put(vi+15,x);  varr.put(vi+16,1.0f);  varr.put(vi+17,0.0f);
 				vi+=18;
 				
-				tcarr.put(ti,ac.x);  tcarr.put(ti+1,ac.y+ac.height);  
-				tcarr.put(ti+2,ac.x);  tcarr.put(ti+3,ac.y); 
-				tcarr.put(ti+4,ac.x+ac.width);  tcarr.put(ti+5,ac.y); 
+				tcarr.put( ti+0 , ac.x );  tcarr.put( ti+1 , ac.y );  
+				tcarr.put( ti+2 , ac.x );  tcarr.put( ti+3 , ac.y+ac.height ); 
+				tcarr.put( ti+4 , ac.x+ac.width );  tcarr.put( ti+5 , ac.y+ac.height ); 
 				
-				tcarr.put(ti+6,ac.x+ac.width);  tcarr.put(ti+7,ac.y); 
-				tcarr.put(ti+8,ac.x+ac.width);  tcarr.put(ti+9,ac.y+ac.height); 
-				tcarr.put(ti+10,ac.x);  tcarr.put(ti+11,ac.y+ac.height); 
+				tcarr.put( ti+6   , ac.x+ac.width );  tcarr.put( ti+7   , ac.y+ac.height ); 
+				tcarr.put( ti+8   , ac.x+ac.width );  tcarr.put( ti+9   , ac.y ); 
+				tcarr.put( ti+10 , ac.x );  tcarr.put( ti+11 , ac.y ); 
+				
 				ti+=12;
 				
 				x+=cw;
@@ -176,9 +178,9 @@ public class FontAtlasTexture {
 		//Log.d(NetHack.LOGTAG,"FontAtlasTexture.render()  width "+x);
 		
 		// lets render string...
-		gl.glTexCoordPointer(3, gl.GL_FLOAT, 0, tcarr);
+		gl.glTexCoordPointer(2, gl.GL_FLOAT, 0, tcarr);
 		gl.glVertexPointer(3, gl.GL_FLOAT, 0, varr);
-		gl.glDrawArrays(gl.GL_TRIANGLES, 0, text.length()*9 );
+		gl.glDrawArrays(gl.GL_TRIANGLES, 0, text.length()*6);
 		
 		gl.glPopMatrix();
 	}

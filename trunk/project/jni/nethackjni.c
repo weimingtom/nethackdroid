@@ -336,6 +336,8 @@ jboolean Java_se_dinamic_nethack_LibNetHack_run( JNIEnv*  env, jobject  obj ) {
   // Let's check if nethack data is installed into sdcard, if not do it...
   struct stat s;
   if(stat(HACKDIR"/nhdat",&s ) != 0) mkdir(HACKDIR,0777); // This would probabley want to be recursive HACKDIR changes.. but it suits for now..
+  if(stat(HACKDIR"/cache",&s ) != 0) mkdir(HACKDIR"/cache",0777); 
+	
   if( _nhji_copy_on_verify_fail(env,"/data/data/se.dinamic.nethack/lib/libnhdat.so",HACKDIR"/nhdat") !=0 ) return JNI_FALSE;
   chdir(HACKDIR);
   
