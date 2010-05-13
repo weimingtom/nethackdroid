@@ -23,6 +23,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class NetHackTextWindow implements NetHackWindow {
 	private boolean _isDisplayed=false;
+	private static boolean _isTextureInitialized=false;
 	
 	private static float PLANE_VERTICES[] = {
 		-0.5f, -0.5f,  0.0f,	// Image plane
@@ -44,9 +45,9 @@ public class NetHackTextWindow implements NetHackWindow {
 	private  static Texture _paperBackground;
 	private  static Resources _resources;
 	
-	public static void initialize(GL10 gl,Resources resources) {
+	public static void initialize(Resources resources) {
 		_resources = resources;
-		_paperBackground = Texture.fromResource(gl,resources,R.drawable.paper);
+		_paperBackground = Texture.fromResource(resources,R.drawable.paper);
 	}
 	
 	
@@ -61,8 +62,14 @@ public class NetHackTextWindow implements NetHackWindow {
 	public void handleGlyph(int x,int y,int glyph) {};
 	
 	public void init(GL10 gl) { }
+	public void preInit() { }
 	
 	public void render(GL10 gl) {
+		if( ! _isTextureInitialized ) {
+			_paperBackground.finalize(gl);
+			_isTextureInitialized=true;
+		}
+		
 		if( _isDisplayed ) {
 			gl.glPushMatrix();
 			gl.glTranslatef(0,0,-1);

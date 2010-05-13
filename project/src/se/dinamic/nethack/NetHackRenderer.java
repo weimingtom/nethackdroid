@@ -20,6 +20,10 @@ package se.dinamic.nethack;
 import javax.microedition.khronos.opengles.GL10;
 
 public interface NetHackRenderer {
+	/** put timeconsuming stuff into here, such as texture generation etc..*/
+	public void preInit();
+	/** this should be the last touch of a init, non time consuming stuff that needs an GL instance.. */
 	public void init(GL10 gl);
+	/** the actual rendering of content...*/
 	public void render(GL10 gl);
 }

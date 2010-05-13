@@ -43,12 +43,13 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
 	_view = new NetHackView(context);
 	_keyevent = new KeyEventQueue();
          
-	_view.setState( NetHackView.STATE_INITIALIZE_GAME );
 	
 	_view.addRenderer( _wm );
 	   
 	_view.setOnKeyListener(this);
         
+	// Let initialize...
+	_view.setState( NetHackView.STATE_INITIALIZE_GAME );
    }	   
     
    public GLSurfaceView getView() {

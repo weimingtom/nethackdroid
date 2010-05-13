@@ -19,15 +19,17 @@
 package se.dinamic.nethack;
 
 import android.content.res.Resources;
-
+import android.util.Log;
 import javax.microedition.khronos.opengles.GL10;
 
 
 /** Rendering in two phases, first an intro animation, then static showing progressbar.. */
 public class NetHackIntroRenderer implements NetHackRenderer {
+	private final static long INTRO_LENGTH_MS = 2000;
 	private Resources _resources;
 	private boolean _isIntroFinished = false;
 	private static float _progress = 0.0f;
+	private long _startTime=0;
 	
 	private Texture _shieldTexture;
 	
@@ -39,19 +41,34 @@ public class NetHackIntroRenderer implements NetHackRenderer {
 		_progress+=add;
 	}
 	
-	public void init(GL10 gl) {
-		_shieldTexture = Texture.fromResource(gl,_resources,R.drawable.shield);
+	public boolean isIntroFinished() {
+		return _isIntroFinished; 
 	}
 	
+	public void preInit() {
+		_shieldTexture = Texture.fromResource(_resources,R.drawable.shield);
+	}
+	
+	public void init(GL10 gl) {
+		_shieldTexture.finalize(gl);
+	}
+	private static float _rotation=0;
 	public void render(GL10 gl) {
+		if( _startTime == 0 ) _startTime = java.lang.System.nanoTime();
 		gl.glPushMatrix();
 		gl.glTranslatef(0,0,-1);
+		_rotation+=1;
 		
 		// The shield...
+		//gl.glRotatef(_rotation,0,1,0);
 		_shieldTexture.render( gl );
 		
 		if( _isIntroFinished ) {
 			// Render progressbar
+		} else {
+			// INTRO_LENGTH_MS secs has elapsed
+			if( (java.lang.System.nanoTime() -  _startTime) > INTRO_LENGTH_MS ) 
+				_isIntroFinished=true;
 		}
 		
 		gl.glPopMatrix();

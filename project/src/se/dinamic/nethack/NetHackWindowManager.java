@@ -61,7 +61,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 	private LinkedHashMap<Integer,Window> _windows;
 	private java.util.Random _random;
 	private Resources _resources;
-	
+	private boolean _isFontInitialized=false;
 	private final ReentrantLock _modalLock = new ReentrantLock();
 	private final ReentrantLock _collectionLock = new ReentrantLock();
 	private Window _modalWindow = null;
@@ -183,21 +183,27 @@ public class NetHackWindowManager implements NetHackRenderer {
 		return id;
 	}
 	
-	
-	public void init(GL10 gl) {
-		Log.d(NetHack.LOGTAG,"NetHackWindowManager.init() Intialize window manager renderer.");
-		
+	public void preInit() {
+		Log.d(NetHack.LOGTAG,"NetHackWindowManager.preInit() Pre intialize window manager renderer.");
 		// intialize the fontatlastexture 
-		FontAtlasTexture.initialize(gl);
+		FontAtlasTexture.initialize();
 		
 		// initialize tile atlas for map window
-		NetHackMapWindow.initialize(gl,_resources);
+		NetHackMapWindow.initialize(_resources);
 		
 		// Initialize text window static data
-		NetHackTextWindow.initialize(gl,_resources);
+		NetHackTextWindow.initialize(_resources);
+	}
+	
+	public void init(GL10 gl) {
+		
 	}
 	
 	public void render(GL10 gl) {
+		if( ! _isFontInitialized ) {
+			FontAtlasTexture.finalize( gl );
+			_isFontInitialized=true;
+		}
 		
 		// Check if we got a modal window showing
 		if( isModalWindow() ) {
