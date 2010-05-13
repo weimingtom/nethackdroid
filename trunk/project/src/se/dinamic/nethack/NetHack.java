@@ -42,7 +42,6 @@ public class NetHack extends Activity
         _nethack = new NetHackEngine( this );
         setContentView( _nethack.getView() );
         
-        _nethack.start();
     }
     
     @Override

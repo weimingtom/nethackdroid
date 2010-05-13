@@ -26,7 +26,7 @@ public class NetHackMessageWindow implements NetHackWindow {
     private boolean _isDisplayed = false;
     private static final int LOG_ENTRIES=40;
     private static final int DISPLAY_LOG_ENTRIES=6;
-    private final java.util.Vector<String> _log=new Vector<String>();
+    private final java.util.Vector<FontAtlasTexture.String> _log=new Vector<FontAtlasTexture.String>();
     
     public NetHackMessageWindow() {
     }
@@ -37,7 +37,7 @@ public class NetHackMessageWindow implements NetHackWindow {
     public void destroy() {};
     
     public void putStr(int attr,String str) {
-        _log.add(str);
+        _log.add( FontAtlasTexture.createString(str) );
         if( _log.size() > LOG_ENTRIES )
             _log.remove( _log.firstElement() );
     };
@@ -79,7 +79,7 @@ public class NetHackMessageWindow implements NetHackWindow {
                         int ioffs=i;
                         if( _log.size() > DISPLAY_LOG_ENTRIES ) 
                             ioffs = _log.size()-DISPLAY_LOG_ENTRIES + i;
-                        FontAtlasTexture.render( gl, _log.get(ioffs) );
+                        _log.get(ioffs).render(gl);
                         gl.glTranslatef(0,-1,0);
                     }
                 
