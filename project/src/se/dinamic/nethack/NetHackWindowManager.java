@@ -107,6 +107,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 	}
 	
 	public int create( int type ) {
+		
 		int winid = generateWindowID();
 		Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() new window"+winid);
 		_collectionLock.lock();

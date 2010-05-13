@@ -34,7 +34,7 @@ import javax.microedition.khronos.opengles.GL10;
 import java.io.FileNotFoundException;
 
 public class FontAtlasTexture {
-	private static final String CHARACTERS="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.!?'-";
+	private static final java.lang.String CHARACTERS="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.!?'-";
 	private static final int ATLAS_SIZE = 512;
 	private static final int ATLAS_MARGIN = 8;
 	
@@ -44,6 +44,51 @@ public class FontAtlasTexture {
 	private static float _characterWidth;
 	
 	public static Typeface _typeFace;
+	
+	/** This is a rendable string. 
+		
+	*/
+	public static class String {
+		/** The width of string, in ratio to height which always equals 1 unit. */
+		private float _width;
+		
+		/** FontAtlas texture to bind when rendering this string */
+		private int _texture;
+		
+		/** Count of characters in string */
+		private int _stringLength;
+		/** Vertext buffer for characters */
+		private FloatBuffer _vertices;
+		/** Texture coordinate buffer for characters */
+		private FloatBuffer _textCoords;
+		
+		private String(int texture,float width,int length, FloatBuffer verticies, FloatBuffer tcords) {
+			_texture=texture;
+			_width=width;
+			_vertices = verticies;
+			_textCoords = tcords;
+			_stringLength = length;
+		}
+		
+		/** Get width of string. */
+		public float getWidth() { return _width; };
+		
+		/** Render string on GL */
+		public void render( GL10 gl ) {
+			gl.glPushMatrix();
+			gl.glEnable( GL10.GL_TEXTURE_2D );
+			gl.glBindTexture( GL10.GL_TEXTURE_2D, _texture );
+			
+			// lets render string...
+			gl.glTexCoordPointer( 2, gl.GL_FLOAT, 0, _textCoords );
+			gl.glVertexPointer( 3, gl.GL_FLOAT, 0, _vertices );
+			gl.glDrawArrays( gl.GL_TRIANGLES, 0, _stringLength * 6 );
+		
+			gl.glPopMatrix( );
+		}
+		
+		
+	}
 	
 	private static class AtlasCharacter {
 		public float x,y,width,height;
@@ -57,9 +102,6 @@ public class FontAtlasTexture {
 	
 	public static void initialize(GL10 gl) {
 		Log.d(NetHack.LOGTAG,"FontAtlasTexture.intialize()  generating font atlas.");
-		
-		
-		 //_map = new LinkedHashMap<char, AtlasCharacter>();
 		
 		// Generate the character atlas
 		Bitmap bm = Bitmap.createBitmap(ATLAS_SIZE, ATLAS_SIZE, Bitmap.Config.ARGB_8888);
@@ -133,10 +175,9 @@ public class FontAtlasTexture {
 			
 	}
 	
-	public static void render(GL10 gl,String text) {
-		gl.glPushMatrix();
-		gl.glEnable(GL10.GL_TEXTURE_2D);
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, _texture[0] );
+	/** Creates a renderable string of the current fontatlas */
+	public static FontAtlasTexture.String createString(java.lang.String text) {
+		
 		
 		// Build u vertex and textcoord arrays to render,
 		FloatBuffer varr = FloatBuffer.allocate((text.length()*9)*3);
@@ -146,11 +187,13 @@ public class FontAtlasTexture {
 		float y=0;
 		int ti=0;
 		int vi=0;
+		float width=0;
 		
 		for(int i=0;i<text.length();i++) {
 			if( _map.containsKey((int)text.charAt(i)) ) 
 			{
 				AtlasCharacter ac =_map.get((int)text.charAt(i));
+				width+=ac.width;
 			
 				float cw = 1.0f * (ac.width / _characterWidth);
 				varr.put(vi,x);  varr.put(vi+1,1.0f);  varr.put(vi+2,0.0f);
@@ -175,14 +218,7 @@ public class FontAtlasTexture {
 				x+=cw;
 			}
 		}
-		//Log.d(NetHack.LOGTAG,"FontAtlasTexture.render()  width "+x);
-		
-		// lets render string...
-		gl.glTexCoordPointer(2, gl.GL_FLOAT, 0, tcarr);
-		gl.glVertexPointer(3, gl.GL_FLOAT, 0, varr);
-		gl.glDrawArrays(gl.GL_TRIANGLES, 0, text.length()*6);
-		
-		gl.glPopMatrix();
+		return new FontAtlasTexture.String( _texture[0], width, text.length(), varr, tcarr );
 	}
 	
 }

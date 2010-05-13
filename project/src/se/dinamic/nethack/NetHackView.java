@@ -32,6 +32,11 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
     private GL10 _gl;
     private Vector _renderers;
     private Context _context;
+    private int _viewState;
+    
+    public final static int STATE_INITIALIZE_GAME=0;
+    public final static int STATE_GAME_RUN=1;
+    
     
     public NetHackView(Context context) {
         super(context);
@@ -40,14 +45,18 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
         setFocusable( true ); 
         setFocusableInTouchMode( true );
         setRenderer( this );
-	    
-	//FontAtlasTexture._typeFace = Typeface.createFromAsset(context.getAssets(), "fonts/Isabella.ttf") ;
-	FontAtlasTexture._typeFace = Typeface.create(Typeface.SANS_SERIF,Typeface.NORMAL);
+        
+        //FontAtlasTexture._typeFace = Typeface.createFromAsset(context.getAssets(), "fonts/Isabella.ttf") ;
+        FontAtlasTexture._typeFace = Typeface.create(Typeface.SANS_SERIF,Typeface.NORMAL);
     }
     
     
     public void addRenderer(NetHackRenderer r) {
         _renderers.add(r);
+    }
+    
+    public void setState( int state ) {
+        _viewState=state;
     }
     
     public void onDrawFrame( GL10 gl ) {
@@ -58,22 +67,34 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
         gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadIdentity();
         
-        // Run thru all renderers to render the scene
-        for(int i=0;i<_renderers.size();i++) {
-            NetHackRenderer r=(NetHackRenderer)_renderers.get(i);
-            r.render( gl );
+        switch( _viewState ) {
+            case STATE_INITIALIZE_GAME:
+            {
+                // Show intro screen and progressbar...
+                
+            } break;
+            
+            case STATE_GAME_RUN:
+            {
+                // Run thru all renderers to render the scene
+                for(int i=0;i<_renderers.size();i++) {
+                    NetHackRenderer r=(NetHackRenderer)_renderers.get(i);
+                    r.render( gl );
+                }
+            }break;
         }
     }
     
     public void onSurfaceCreated( GL10 gl, EGLConfig config ) {
-	_gl=gl;
-	    
-	// Pass initialize to all renderers...
-	for(int i=0;i<_renderers.size();i++) {
+    _gl=gl;
+        
+    // Pass initialize to all renderers...
+    for(int i=0;i<_renderers.size();i++) {
             NetHackRenderer r=(NetHackRenderer)_renderers.get(i);
             r.init( gl );
         }
-	
+    
+    
         gl.glDisable( GL10.GL_DITHER );
         gl.glHint( GL10.GL_PERSPECTIVE_CORRECTION_HINT , GL10.GL_NICEST );
         gl.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f);
@@ -91,9 +112,13 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
         // for performance
         gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
         //gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
-	gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+        gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 
-	
+
+        // So all is initialized at this point lets
+        // start nethack game...
+        NetHackEngine.startGame();
+
     } 
     
     public void onSurfaceChanged( GL10 gl, int width, int height ) {
@@ -101,9 +126,9 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
         _gl = gl;
         gl.glViewport(0, 0, width, height);
         
-	NetHackWindowManager.screenWidth = width;
-	NetHackWindowManager.screenHeight = height;
-	    
+        NetHackWindowManager.screenWidth = width;
+        NetHackWindowManager.screenHeight = height;
+        
         // Calculate new projection matrix on viewport dimension change
         float ratio = (float) width / height;
         gl.glMatrixMode(GL10.GL_PROJECTION);

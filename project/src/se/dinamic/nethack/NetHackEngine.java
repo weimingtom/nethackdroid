@@ -32,7 +32,7 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
 {
     private Activity _context;
     private KeyEventQueue _keyevent;
-    private NetHackView _view;
+    private static NetHackView _view;
     private NetHackWindowManager _wm;
     
     public NetHackEngine(Activity context) 
@@ -43,6 +43,8 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
 	_view = new NetHackView(context);
 	_keyevent = new KeyEventQueue();
          
+	_view.setState( NetHackView.STATE_INITIALIZE_GAME );
+	
 	_view.addRenderer( _wm );
 	   
 	_view.setOnKeyListener(this);
@@ -53,7 +55,8 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
        return _view;
    }
    
-    public void start() {
+    public static void startGame() {
+	_view.setState( NetHackView.STATE_GAME_RUN );
        run();
     }
     
