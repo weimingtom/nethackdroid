@@ -65,10 +65,8 @@ public class NetHackTextWindow implements NetHackWindow {
 	public void render(GL10 gl) {
 		if( _isDisplayed ) {
 			gl.glPushMatrix();
-				gl.glBindTexture(GL10.GL_TEXTURE_2D,_paperBackground.texture());
-				gl.glTexCoordPointer(2, gl.GL_FLOAT, 0, _planeTextureCoords);
-				gl.glVertexPointer(3, gl.GL_FLOAT, 0, _planeVertices);
-				gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, 4 );
+			gl.glTranslatef(0,0,-1);
+			_paperBackground.render(gl);
 			gl.glPopMatrix();
 		}
 	}

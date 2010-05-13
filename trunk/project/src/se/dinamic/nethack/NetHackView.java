@@ -20,6 +20,7 @@ package se.dinamic.nethack;
 
 import android.opengl.GLSurfaceView;
 import android.content.Context;
+import android.util.Log;
 
 import android.graphics.Typeface;
 import javax.microedition.khronos.egl.EGL10;
@@ -34,6 +35,8 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
     private Context _context;
     private int _viewState;
     
+    private NetHackIntroRenderer _introRenderer;
+    
     public final static int STATE_INITIALIZE_GAME=0;
     public final static int STATE_GAME_RUN=1;
     
@@ -42,12 +45,20 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
         super(context);
         _context=context;
         _renderers=new Vector<NetHackRenderer>();
+        _viewState=STATE_INITIALIZE_GAME;
+        
         setFocusable( true ); 
         setFocusableInTouchMode( true );
-        setRenderer( this );
-        
+   
+        // Set default typeface in FontAtlasTexture
         //FontAtlasTexture._typeFace = Typeface.createFromAsset(context.getAssets(), "fonts/Isabella.ttf") ;
         FontAtlasTexture._typeFace = Typeface.create(Typeface.SANS_SERIF,Typeface.NORMAL);
+
+        // Create the intro renderer
+        _introRenderer = new NetHackIntroRenderer( context.getResources() );
+    
+        // Fire off setting the GL renderer
+        setRenderer( this );
     }
     
     
@@ -56,6 +67,7 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
     }
     
     public void setState( int state ) {
+        Log.d(NetHack.LOGTAG,"NetHackView.setState() Change view state too "+state);
         _viewState=state;
     }
     
@@ -71,6 +83,7 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
             case STATE_INITIALIZE_GAME:
             {
                 // Show intro screen and progressbar...
+                _introRenderer.render( gl );
                 
             } break;
             
@@ -85,14 +98,37 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
         }
     }
     
-    public void onSurfaceCreated( GL10 gl, EGLConfig config ) {
-    _gl=gl;
+    private static class InitializeRenderersJob extends Thread {
+        private Vector<NetHackRenderer> _renderers;
+        private  GL10 _gl;
         
-    // Pass initialize to all renderers...
-    for(int i=0;i<_renderers.size();i++) {
-            NetHackRenderer r=(NetHackRenderer)_renderers.get(i);
-            r.init( gl );
+        public InitializeRenderersJob( GL10 gl, Vector<NetHackRenderer> renderers ) {
+            _renderers = renderers;
+            _gl=gl;
         }
+        
+        public void run() {
+            Log.d(NetHack.LOGTAG,"NetHackView.InitializeRenderersJob.run() Running initialization of renderers job.");
+            for(int i=0;i<_renderers.size();i++) {
+                NetHackRenderer r=(NetHackRenderer)_renderers.get(i);
+                r.init( _gl );
+            }
+            
+            // Everything is initialized at this point lets
+            // start nethack game...
+            NetHackEngine.startGame();
+        }
+    }
+    
+    public void onSurfaceCreated( GL10 gl, EGLConfig config ) {
+        _gl=gl;
+        
+        // Pass initialize all renderers
+        _introRenderer.init( gl );
+        
+        // Initialize all renderers assigned to the view..
+        InitializeRenderersJob job=new InitializeRenderersJob(gl,_renderers);
+        job.run();
     
     
         gl.glDisable( GL10.GL_DITHER );
@@ -115,9 +151,7 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
         gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 
 
-        // So all is initialized at this point lets
-        // start nethack game...
-        NetHackEngine.startGame();
+        
 
     } 
     
