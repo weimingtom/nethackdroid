@@ -42,7 +42,7 @@ public class FontAtlasTexture {
 	/** The max height of a character in atlas */
 	private static float _characterHeight;
 	private static float _characterWidth;
-	
+	private static ByteBuffer _data;
 	public static Typeface _typeFace;
 	
 	/** This is a rendable string. 
@@ -99,8 +99,16 @@ public class FontAtlasTexture {
 	public FontAtlasTexture() {
 	}
 	
+	public static void finalize( GL10 gl) {
+		_texture = new int[1];
+		gl.glGenTextures( 1, _texture, 0); 
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, _texture[0] );
+		gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, ATLAS_SIZE, ATLAS_SIZE, 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, _data);
+		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR); 
+	}
 	
-	public static void initialize(GL10 gl) {
+	public static void initialize() {
 		Log.d(NetHack.LOGTAG,"FontAtlasTexture.intialize()  generating font atlas.");
 		
 		// Generate the character atlas
@@ -151,14 +159,9 @@ public class FontAtlasTexture {
 		}
 		
 		// Let's convert bitmap argb to rgba bytebuffer
-		ByteBuffer data=Texture.argb2rgba(bm);
+		_data = Texture.argb2rgba(bm);
 		
-		_texture = new int[1];
-		gl.glGenTextures( 1, _texture, 0); 
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, _texture[0] );
-		gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, ATLAS_SIZE, ATLAS_SIZE, 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, data);
-		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
-		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR); 
+		
 		
 		// Debug save it to file..
 		try {

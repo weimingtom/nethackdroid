@@ -37,6 +37,7 @@ import javax.microedition.khronos.opengles.GL10;
 public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 	private static NetHackTileAtlas _atlas;
 	private boolean _isDisplayed=false;
+	private static boolean _isTextureInitialized=false;
 	
 	private static float PLANE_VERTICES[] = {
 		-0.5f, -0.5f,  0.0f,	// Image plane
@@ -62,20 +63,26 @@ public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 		
 	}
 	
-	public static void initialize(GL10 gl,Resources resources) {
+	public static void initialize(Resources resources) {
 		_atlas = NetHackTileAtlas.createFromResource(resources,R.drawable.absurd32);
-		_atlas.generate(gl);
+		
 	}
 	
 	
 	public void display(int flag) { _isDisplayed = true; };
 	public void destroy() { };
-	
+	public void handleGlyph(int x, int y,int glyph) { super.handleGlyph(x,y,glyph); }
 	public void putStr(int attr,String str) {};
 	
 	public void init(GL10 gl) {}
+	public void preInit() {}
 	
 	public void render(GL10 gl) {
+		if( ! _isTextureInitialized ) {
+			_atlas.generate(gl);
+			_isTextureInitialized = true;
+		}
+		
 		if( _isDisplayed ) {
 			
 			gl.glPushMatrix();

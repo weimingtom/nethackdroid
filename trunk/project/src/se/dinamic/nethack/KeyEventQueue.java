@@ -109,6 +109,15 @@ public class KeyEventQueue {
 		case KeyEvent.KEYCODE_R: // Read
 			  key = 'r' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
                 break;
+		
+		case 59: // <
+			key = '<' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
+		break;
+		
+		/*case 56: // >
+			key = '>' | ((keysym&KeyEvent.META_SHIFT_LEFT_ON)!=0?NETHACK_META_BIT:0);
+		break;*/
+		
             }
             
             // Add key to queue

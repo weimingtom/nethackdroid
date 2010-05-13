@@ -41,14 +41,11 @@ class NetHackMap {
 	}
 	
 	private LinkedHashMap<Position, Integer > _map;
+	
 	private String _levelName;
+	
 	private final ReentrantLock _lock = new ReentrantLock();
-	/** The max size of map... */
-	//public static final int SIZE=256;
-	
-	/** This should be replaced with a more sophisticated type than int... like NetHackMapObject */
-	//private int _map[][];
-	
+
 	protected int _playerX,_playerY;
 	
 	public NetHackMap () {
@@ -79,10 +76,10 @@ class NetHackMap {
 			_playerX=x;
 			_playerY=y;
 		}
-		Position pos=new Position((short)x,(short)y);
 		lock();
+		Position pos=new Position((short)x,(short)y);
 		_map.put(pos,glyph);
-		Log.v(NetHack.LOGTAG,"NetHackMap.handleGlyph() update map pos "+x+"x"+y+" with glyph "+glyph+", mapsize "+_map.size());
+		Log.v(NetHack.LOGTAG,"NetHackMap.handleGlyph() update map pos "+(short)x+"x"+(short)y+" with glyph "+glyph+", mapsize "+_map.size());
 		unlock();
 	}
 }

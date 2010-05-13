@@ -43,14 +43,6 @@ import java.nio.channels.ReadableByteChannel;
 import android.util.Log;
 
 public class Texture {
-	private GL10 _gl;
-	private int _texture[];
-	
-	private float _textureRatio;
-	
-	
-	private static FloatBuffer _planeVertices=null;
-	private static FloatBuffer _planeTextureCoords=null;
 	
 	private static float PLANE_VERTICES[] = {
 		-0.5f, -0.5f,  0.0f,	// Image plane
@@ -66,8 +58,19 @@ public class Texture {
 		1.0f, 0.0f
 	};
 	
-	private Texture(GL10 gl) {
-		_gl = gl;
+	
+	private static FloatBuffer _planeVertices=null;
+	private static FloatBuffer _planeTextureCoords=null;
+	
+	private int _texture[];
+	private float _textureRatio;
+	private  ByteBuffer _data=null;
+	private int _width;
+	private int _height;
+	private boolean _isFinalized=false;
+	
+	private Texture() {
+		
 		_texture = new int[1];
 		
 		// if 3d plane not is initialized lets do it...
@@ -94,9 +97,9 @@ public class Texture {
 		gl.glPopMatrix();
 	}
 	
-	public static Texture fromFile( GL10 gl, String file ) {
+	public static Texture fromFile( String file ) {
 		int gltexture;
-		Texture texture = new Texture( gl );
+		Texture texture = new Texture(  );
 		// open file as inputstream 
 		// texture.createFromStream( stream);
 		return texture;
@@ -138,27 +141,27 @@ public class Texture {
 		return true;
 	}
 	
-	public static Texture fromStream( GL10 gl, InputStream stream) {
+	public static Texture fromStream(  InputStream stream) {
 		int gltexture;
-		Texture texture = new Texture( gl );
+		Texture texture = new Texture( );
 		texture.createFromStream( stream );
 		return texture;
 	}
 	
-	public static Texture fromBitmap( GL10 gl, Bitmap bmp) {
+	public static Texture fromBitmap(  Bitmap bmp) {
 		int gltexture;
-		Texture texture = new Texture( gl );
+		Texture texture = new Texture( );
 		texture.createFromBitmap( bmp );
 		bmp.recycle();
 		return texture;
 	}
 	
 	/** Create texture from resource, if the texture exists in cache lets load it from there ..*/
-	public static Texture fromResource( GL10 gl, Resources resources, int id ) {
+	public static Texture fromResource( Resources resources, int id ) {
 		Log.d(NetHack.LOGTAG,"Texture.fromResource() Loading and creating texture.");
 		
 		int gltexture;
-		Texture texture = new Texture( gl );
+		Texture texture = new Texture( );
 		texture.createFromResources( resources, id );
 		Log.d(NetHack.LOGTAG,"Texture.fromResource() finished.");
 		return texture;
@@ -175,29 +178,31 @@ public class Texture {
 		Bitmap bmp = Bitmap.createScaledBitmap( src, 128, 128, true );
 		Bitmap realbmp = bmp.copy( Config.ARGB_8888, false );
 		
-		ByteBuffer bb = Texture.argb2rgba(realbmp); 
-		createFromRGBAByteBuffer( bb, realbmp.getWidth(), realbmp.getHeight() );
+		_data = Texture.argb2rgba(realbmp); 
+		_width=realbmp.getWidth();
+		_height=realbmp.getHeight();
+		
 		bmp.recycle();
 		realbmp.recycle();
 	}
 	
 	
 	private void createFromResources( Resources resources, int id ) {
-		int width=0,height=0;
-		ByteBuffer bb=readCache(id);
 		
-		if( bb == null ) {
+		_data = readCache(id);
+		
+		if( _data == null ) {
 			Log.d(NetHack.LOGTAG,"Texture.createFromResources() No cached texture data found, decoding resource.");
 		
 			// Ensure bitmap is 4 chan 8bit pic
 			Bitmap bmp = BitmapFactory.decodeResource( resources, id );
 			Bitmap realbmp = bmp.copy(Config.ARGB_8888, false);
 		
-			bb=Texture.argb2rgba(realbmp); 
+			_width=realbmp.getWidth();
+			_height=realbmp.getHeight();
+			_data=Texture.argb2rgba(realbmp); 
 		
-			createFromRGBAByteBuffer( bb, realbmp.getWidth(), realbmp.getHeight() );
-			
-			storeCache(id, bb );
+			storeCache( id, _data );
 			
 			bmp.recycle();
 			realbmp.recycle();
@@ -206,8 +211,8 @@ public class Texture {
 			Log.d(NetHack.LOGTAG,"Texture.createFromResources() Reusing cached texture data.");
 			BitmapFactory.Options specs=new BitmapFactory.Options();
 			Bitmap bm = BitmapFactory.decodeResource( resources, id, specs);
-			createFromRGBAByteBuffer( bb, specs.outWidth, specs.outHeight );
-			
+			_width=specs.outWidth;
+			_height=specs.outHeight;
 		}
 			
 	}
@@ -215,20 +220,21 @@ public class Texture {
 	private void createFromBitmap( Bitmap bmp ) {
 		// Ensure bitmap is 4 chan 8bit pic
 		//Bitmap realbmp = bmp.copy(Config.ARGB_8888, false);
-		ByteBuffer bb = Texture.argb2rgba(bmp); 
-		createFromRGBAByteBuffer( bb, bmp.getWidth(), bmp.getHeight() );
+		//_data = Texture.argb2rgba(bmp); 
+		//createFromRGBAByteBuffer( bb, bmp.getWidth(), bmp.getHeight() );
 		//realbmp.recycle();
 	}
 	
-	private void createFromRGBAByteBuffer( ByteBuffer data, int width, int height ) {
-		_gl.glGenTextures( 1, _texture, 0); 
-		_gl.glBindTexture(GL10.GL_TEXTURE_2D, _texture[0] );
-		_gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, width, height, 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, data);
-		_gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
-		_gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR); 
-		_textureRatio = (width/height);
+	public void finalize(GL10 gl) {
+		gl.glGenTextures( 1, _texture, 0); 
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, _texture[0] );
+		gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, _width, _height, 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, _data);
+		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR); 
+		_textureRatio = (_width/_height);
+		_isFinalized=true;
+		// Free _data
 	}
-	
 	
 	public static ByteBuffer argb2rgba(Bitmap bmp)
 	{

@@ -24,6 +24,7 @@ import java.util.Vector;
 
 public class NetHackMessageWindow implements NetHackWindow {
     private boolean _isDisplayed = false;
+    
     private static final int LOG_ENTRIES=40;
     private static final int DISPLAY_LOG_ENTRIES=6;
     private final java.util.Vector<FontAtlasTexture.String> _log=new Vector<FontAtlasTexture.String>();
@@ -32,6 +33,7 @@ public class NetHackMessageWindow implements NetHackWindow {
     }
     
     public void init(GL10 gl) { }
+    public void preInit() { }
     
     public void display(int flag) { _isDisplayed = true; };
     public void destroy() {};
@@ -45,6 +47,7 @@ public class NetHackMessageWindow implements NetHackWindow {
     public void handleGlyph(int x,int y,int glyph) {};
         
     public void render(GL10 gl) {
+	
         if( _isDisplayed ) {
             // Render string
             float tscale=0.045f;
