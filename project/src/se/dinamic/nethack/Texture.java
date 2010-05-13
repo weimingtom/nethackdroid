@@ -26,6 +26,7 @@ import android.graphics.BitmapFactory;
 import javax.microedition.khronos.opengles.GL10;
 
 import java.nio.IntBuffer;
+import java.nio.FloatBuffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.io.InputStream;
@@ -45,9 +46,52 @@ public class Texture {
 	private GL10 _gl;
 	private int _texture[];
 	
+	private float _textureRatio;
+	
+	
+	private static FloatBuffer _planeVertices=null;
+	private static FloatBuffer _planeTextureCoords=null;
+	
+	private static float PLANE_VERTICES[] = {
+		-0.5f, -0.5f,  0.0f,	// Image plane
+		 0.5f, -0.5f,  0.0f,
+		-0.5f,  0.5f,  0.0f,
+		 0.5f,  0.5f,  0.0f
+	};
+	
+	private float PLANE_TEXTURE_COORDS[] = {
+		0.0f, 1.0f,
+		1.0f, 1.0f,
+		0.0f, 0.0f,
+		1.0f, 0.0f
+	};
+	
 	private Texture(GL10 gl) {
 		_gl = gl;
 		_texture = new int[1];
+		
+		// if 3d plane not is initialized lets do it...
+		if( _planeVertices == null ) {
+			_planeVertices 		= FloatBuffer.wrap( PLANE_VERTICES, 0, PLANE_VERTICES.length  );
+			_planeTextureCoords	= FloatBuffer.wrap( PLANE_TEXTURE_COORDS, 0, PLANE_TEXTURE_COORDS.length );
+		}
+		
+	}
+	
+	/** renders the texture on a centered 1x1 plane. */
+	public void render(GL10 gl) {
+		gl.glPushMatrix();
+		gl.glEnable(GL10.GL_TEXTURE_2D);
+		gl.glBindTexture(GL10.GL_TEXTURE_2D,_texture[0]);
+		
+		// scale texture to fit texture ratio width always equals 1 unit
+		//gl.glScalef(1.0f,_textureRatio,1.0f);
+		
+		// Render tile textured plane..
+		gl.glTexCoordPointer(2, gl.GL_FLOAT, 0, _planeTextureCoords);
+		gl.glVertexPointer(3, gl.GL_FLOAT, 0, _planeVertices);
+		gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, 4 );
+		gl.glPopMatrix();
 	}
 	
 	public static Texture fromFile( GL10 gl, String file ) {
@@ -182,6 +226,7 @@ public class Texture {
 		_gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, width, height, 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, data);
 		_gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
 		_gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR); 
+		_textureRatio = (width/height);
 	}
 	
 	
