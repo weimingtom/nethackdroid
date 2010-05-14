@@ -32,8 +32,8 @@ class NetHackMap {
 		private short _Y;
 		public int getX() { return _X; }
 		public int getY() { return _Y; }
-		public Position( short x,short y) { _X=x; _Y=y; }
-		public int hashCode() { return _X << 16 <<_Y;}
+		public Position( short x,short y) { _X=x; _Y=y; Log.d(NetHack.LOGTAG,"Position.Position() hash "+hashCode()); }
+		public int hashCode() { return _X << 16 | _Y;}
 		public boolean equals(Object p) {
 			if( p.hashCode() == hashCode() ) return true;
 			return false;

@@ -70,7 +70,7 @@ public class NetHackIntroRenderer implements NetHackRenderer {
 			// Render progressbar
 		} else {
 			// INTRO_LENGTH_MS secs has elapsed
-			if( (java.lang.System.nanoTime() -  _startTime) > INTRO_LENGTH_MS ) 
+			//if( (java.lang.System.nanoTime() -  _startTime) > INTRO_LENGTH_MS ) 
 				_isIntroFinished=true;
 		}
 		
