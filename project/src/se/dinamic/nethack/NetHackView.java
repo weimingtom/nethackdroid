@@ -161,8 +161,8 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
 	gl.glCullFace(GL10.GL_BACK);
 	gl.glShadeModel(GL10.GL_FLAT);
 	
-	gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA);
 	gl.glEnable(GL10.GL_BLEND);
+	gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 	gl.glEnable(GL10.GL_COLOR_MATERIAL);
 	gl.glEnable(GL10.GL_TEXTURE_2D);
 	

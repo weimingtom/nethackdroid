@@ -18,31 +18,34 @@
 
 package se.dinamic.nethack;
 import android.content.res.Resources;
+import java.nio.ShortBuffer;
 import java.nio.FloatBuffer;
 import javax.microedition.khronos.opengles.GL10;
 import java.util.Vector;
 
 public class NetHackMessageWindow implements NetHackWindow {
 	
-	private static float PLANE_VERTICES[] = {
-		0.0f, 1.0f,  0.0f,	// Image plane
-		0.0f, 0.0f,  0.0f,
-		1.0f,  0.0f,  0.0f,
+	private static float PLANE_VERTICES[] = {// Image plane
+		1.0f,1.0f,  0.0f,	
+		0.0f, 0.0f,  0.0f,	
 		1.0f, 0.0f,  0.0f,
-		1.0f, 1.0f,  0.0f,
-		0.0f, 1.0f,  0.0f
+		0.0f,  1.0f,  0.0f
+	};
+	
+	private static short VERTEX_INDICIES[] = {
+		0,1,2,
+		0,3,1
 	};
 	
 	private static float VERTEX_COLORS[] = {
-		1.0f,0.0f,0.0f,1.0f,
-		0.0f,1.0f,0.0f,1.0f,
-		0.0f,0.0f,1.0f,1.0f,
-		1.0f,1.0f,0.0f,1.0f,
-		0.0f,1.0f,1.0f,1.0f,
-		1.0f,1.0f,1.0f,1.0f
+		0.0f,0.0f,0.0f,0.6f,
+		0.0f,0.0f,0.0f,0.6f,
+		0.0f,0.0f,0.0f,0.6f,
+		0.0f,0.0f,0.0f,0.6f
 	};
 	
 	
+	private static ShortBuffer _planeVerticesIndicies =null;
 	private static FloatBuffer _planeVertices=null;
 	private static FloatBuffer _planeVertexColors=null;
 	
@@ -65,6 +68,7 @@ public class NetHackMessageWindow implements NetHackWindow {
 		// if 3d plane not is initialized lets do it...
 		if( _planeVertices == null ) {
 			_planeVertices 		= FloatBuffer.wrap( PLANE_VERTICES, 0, PLANE_VERTICES.length  );
+			_planeVerticesIndicies	= ShortBuffer.wrap( VERTEX_INDICIES, 0, VERTEX_INDICIES.length );
 			_planeVertexColors	= FloatBuffer.wrap( VERTEX_COLORS, 0, VERTEX_COLORS.length );
 		}
 	}
@@ -85,9 +89,9 @@ public class NetHackMessageWindow implements NetHackWindow {
 			_repeatCount=0;
 			_log.add( FontAtlasTexture.createString(str) );
 			_lastStringAdded = str;
-		
 		}
 		
+		// If log is full remove oldest entry..
 		if( _log.size() > LOG_ENTRIES )
 			_log.remove( _log.firstElement() );
 
@@ -121,27 +125,26 @@ public class NetHackMessageWindow implements NetHackWindow {
 				
 					// Place start of messagewindow at bottom 1= top 
 					gl.glTranslatef(0,0,0);
-				
 					
+					// Render background plane...
+					// TODO: Fix issue with colored vertexes...
+					gl.glPushMatrix();
+					gl.glScalef(1,tscale*DISPLAY_LOG_ENTRIES,1);
+					gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+					gl.glVertexPointer(3, GL10.GL_FLOAT, 0, _planeVertices);
+					gl.glColorPointer(4, GL10.GL_FLOAT, 0, _planeVertexColors);
+					gl.glDrawElements(GL10.GL_TRIANGLES, 6, GL10.GL_UNSIGNED_SHORT, _planeVerticesIndicies);
+					gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+					gl.glPopMatrix();
 				
 					// Scale rendering of text...
 					gl.glScalef((tscale/2.0f),tscale,tscale);
-				
-					// Render background plane...
-					/* TODO: Fix issue with colored vertexes...
-					gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-					gl.glVertexPointer(3, gl.GL_FLOAT, 0, _planeVertices);
-					gl.glColorPointer(4, gl.GL_FLOAT, 0, _planeVertexColors);
-					gl.glDrawArrays(gl.GL_TRIANGLES, 0, 6 );
-					gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-					gl.glTranslatef(0,0,0);
-					*/
 					
 					for(int i=0; i < DISPLAY_LOG_ENTRIES; i++) {
 						if( _log.size() == 0) break;
 						int ioffs = (_log.size()-1) - i;
 						if( ioffs>0 ) { // Render log entry
-							_log.get(ioffs).render(gl,0.2f + (1.0f-((1.0f/DISPLAY_LOG_ENTRIES)*i)) );
+							_log.get(ioffs).render(gl,1.0f-((1.0f/DISPLAY_LOG_ENTRIES)*i));
 							gl.glTranslatef(0,1,0);
 						} else // No more entries to show let's breakout
 							break;
