@@ -236,7 +236,7 @@ public class FontAtlasTexture {
 				// Setup initial color array
 				for(int v=0;v<6;v++) {
 					for(int c=0;c<4;c++) 
-						vcarr.put(ci+c,0.5f);
+						vcarr.put(ci+c,1.0f);
 					ci+=4;
 				}
 				

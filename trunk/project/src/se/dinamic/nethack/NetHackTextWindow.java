@@ -73,6 +73,7 @@ public class NetHackTextWindow implements NetHackWindow {
 		if( _isDisplayed ) {
 			gl.glPushMatrix();
 			gl.glTranslatef(0,0,-1);
+			gl.glScalef(1.5f,2.0f,1.0f);
 			_paperBackground.render(gl);
 			gl.glPopMatrix();
 		}

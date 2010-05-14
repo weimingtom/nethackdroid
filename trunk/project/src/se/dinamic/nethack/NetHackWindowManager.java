@@ -218,10 +218,10 @@ public class NetHackWindowManager implements NetHackRenderer {
 		}
 		
 		// Check if we got a modal window showing
-		if( isModalWindow() ) {
+		//if( isModalWindow() ) {
 			// We are showing a modal window lets render it..
-			_modalWindow.window.render( gl );
-		} else {
+		//	_modalWindow.window.render( gl );
+		//} else {
 			// Run thru all window and render them...
 			_collectionLock.lock();
 			
@@ -242,7 +242,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 				} while( it.hasNext() );
 			}	*/
 			_collectionLock.unlock();			
-		}
+		//}
 		
 		
 	}
