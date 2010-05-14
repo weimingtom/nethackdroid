@@ -22,6 +22,7 @@ import android.util.Log;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Random;
 import javax.microedition.khronos.opengles.GL10;
@@ -58,6 +59,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 	
 	
 	/** Internal storage of windows */
+	private ArrayList<Window> _windowRenderOrder;
 	private LinkedHashMap<Integer,Window> _windows;
 	private java.util.Random _random;
 	private Resources _resources;
@@ -77,6 +79,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 		_resources=resources;
 		_random = new java.util.Random();
 		_windows = new LinkedHashMap<Integer,Window>();
+		_windowRenderOrder = new ArrayList<Window>();
 	}
 	
 	public void putStr(int winid,int attr, String str) {
@@ -117,7 +120,9 @@ public class NetHackWindowManager implements NetHackRenderer {
 				Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() creating map window.");
 				// Intiialize map renderer
 				_mapWindow = new NetHackMapWindow();
-				_windows.put(winid,new Window(winid,type,_mapWindow));
+				Window win=new Window(winid,type,_mapWindow);
+				_windows.put(winid,win);
+				_windowRenderOrder.add(0,win);
 				
 			} break;
 			
@@ -125,11 +130,16 @@ public class NetHackWindowManager implements NetHackRenderer {
 			{
 				Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() creating message window.");
 				NetHackMessageWindow mw = new NetHackMessageWindow();
-				_windows.put(winid,new Window(winid,type, mw) );
+				Window win=new Window(winid,type,mw);
+				_windows.put(winid, win);
+				int index=0;
+				if(_windowRenderOrder.size() >= 1) index=1;
+				_windowRenderOrder.add(index,win);
 			} break;
 			case NHW_STATUS:
 			{
 				Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() creating status window.");
+				//_windows.put(winid,new Window(winid,type,-0.001f, mw) );
 			} break;
 			case NHW_MENU:
 			{
@@ -139,7 +149,9 @@ public class NetHackWindowManager implements NetHackRenderer {
 			{
 				Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() creating text window.");
 				NetHackTextWindow tw=new NetHackTextWindow();
-				_windows.put(winid,new Window(winid,type, tw) );
+				Window win=new Window(winid,type,tw);
+				_windows.put(winid,win);
+				_windowRenderOrder.add(win);
 			} break;
 			default:
 				
@@ -212,16 +224,23 @@ public class NetHackWindowManager implements NetHackRenderer {
 		} else {
 			// Run thru all window and render them...
 			_collectionLock.lock();
-			Set ws=_windows.entrySet();
+			
+			for( int i=0;i<_windowRenderOrder.size();i++) {
+				_windowRenderOrder.get(i).window.render( gl );
+			}
+			
+			/*Set ws=_windows.entrySet();
 			Iterator<Entry> it = ws.iterator();
 			if( it.hasNext() ) {			
 				do {
 					Entry<Integer,Window> e = it.next();
 					Window w = e.getValue();
 					// render the window..
+					gl.glTranslatef(0,0,w.z);
 					w.window.render( gl );
+					gl.glTranslatef(0,0,-w.z);
 				} while( it.hasNext() );
-			}	
+			}	*/
 			_collectionLock.unlock();			
 		}
 		

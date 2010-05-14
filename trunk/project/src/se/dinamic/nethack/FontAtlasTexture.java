@@ -61,12 +61,18 @@ public class FontAtlasTexture {
 		private FloatBuffer _vertices;
 		/** Texture coordinate buffer for characters */
 		private FloatBuffer _textCoords;
+		/** vertex color buffer for characters */
+		private FloatBuffer _vertexColors;
 		
-		private String(int texture,float width,int length, FloatBuffer verticies, FloatBuffer tcords) {
+		/** The alphavalue of string rendering. */
+		private float _alpha=1.0f;
+		
+		private String(int texture,float width,int length, FloatBuffer verticies, FloatBuffer tcords,FloatBuffer vcolors) {
 			_texture=texture;
 			_width=width;
 			_vertices = verticies;
 			_textCoords = tcords;
+			_vertexColors = vcolors;
 			_stringLength = length;
 		}
 		
@@ -74,14 +80,24 @@ public class FontAtlasTexture {
 		public float getWidth() { return _width; };
 		
 		/** Render string on GL */
-		public void render( GL10 gl ) {
+		public void render( GL10 gl, float alpha ) {
 			gl.glPushMatrix();
 			gl.glEnable( GL10.GL_TEXTURE_2D );
 			gl.glBindTexture( GL10.GL_TEXTURE_2D, _texture );
 			
+			// setup vertext colorarray with alpha
+			if( alpha != _alpha ) {
+				int entries=_vertexColors.capacity();
+				for(int e=3;e<entries;e+=4) {
+					_vertexColors.put(e,alpha);
+				}
+				_alpha=alpha;
+			}
+			
 			// lets render string...
 			gl.glTexCoordPointer( 2, gl.GL_FLOAT, 0, _textCoords );
 			gl.glVertexPointer( 3, gl.GL_FLOAT, 0, _vertices );
+			gl.glColorPointer(4, gl.GL_FLOAT, 0, _vertexColors);
 			gl.glDrawArrays( gl.GL_TRIANGLES, 0, _stringLength * 6 );
 		
 			gl.glPopMatrix( );
@@ -185,11 +201,12 @@ public class FontAtlasTexture {
 		// Build u vertex and textcoord arrays to render,
 		FloatBuffer varr = FloatBuffer.allocate((text.length()*9)*3);
 		FloatBuffer tcarr = FloatBuffer.allocate((text.length()*9)*2);
-		
+		FloatBuffer vcarr = FloatBuffer.allocate((text.length()*9)*4);
 		float x=0;
 		float y=0;
 		int ti=0;
 		int vi=0;
+		int ci=0;
 		float width=0;
 		
 		for(int i=0;i<text.length();i++) {
@@ -216,12 +233,19 @@ public class FontAtlasTexture {
 				tcarr.put( ti+8   , ac.x+ac.width );  tcarr.put( ti+9   , ac.y ); 
 				tcarr.put( ti+10 , ac.x );  tcarr.put( ti+11 , ac.y ); 
 				
+				// Setup initial color array
+				for(int v=0;v<6;v++) {
+					for(int c=0;c<4;c++) 
+						vcarr.put(ci+c,0.5f);
+					ci+=4;
+				}
+				
 				ti+=12;
 				
 				x+=cw;
 			}
 		}
-		return new FontAtlasTexture.String( _texture[0], width, text.length(), varr, tcarr );
+		return new FontAtlasTexture.String( _texture[0], width, text.length(), varr, tcarr ,vcarr);
 	}
 	
 }
