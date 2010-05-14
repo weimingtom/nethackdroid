@@ -51,6 +51,13 @@ public class Texture {
 		 0.5f,  0.5f,  0.0f
 	};
 	
+	private static float VERTEX_COLORS[] = {
+		1,1,1,1,
+		1,1,1,1,
+		1,1,1,1,
+		1,1,1,1
+	};
+	
 	private float PLANE_TEXTURE_COORDS[] = {
 		0.0f, 1.0f,
 		1.0f, 1.0f,
@@ -61,6 +68,7 @@ public class Texture {
 	
 	private static FloatBuffer _planeVertices=null;
 	private static FloatBuffer _planeTextureCoords=null;
+	private static FloatBuffer _planeVertexColors=null;
 	
 	private int _texture[];
 	private float _textureRatio;
@@ -77,6 +85,7 @@ public class Texture {
 		if( _planeVertices == null ) {
 			_planeVertices 		= FloatBuffer.wrap( PLANE_VERTICES, 0, PLANE_VERTICES.length  );
 			_planeTextureCoords	= FloatBuffer.wrap( PLANE_TEXTURE_COORDS, 0, PLANE_TEXTURE_COORDS.length );
+			_planeVertexColors	= FloatBuffer.wrap( VERTEX_COLORS, 0, VERTEX_COLORS.length );
 		}
 		
 	}
@@ -93,6 +102,7 @@ public class Texture {
 		// Render tile textured plane..
 		gl.glTexCoordPointer(2, gl.GL_FLOAT, 0, _planeTextureCoords);
 		gl.glVertexPointer(3, gl.GL_FLOAT, 0, _planeVertices);
+		gl.glColorPointer(4, gl.GL_FLOAT, 0, _planeVertexColors);
 		gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, 4 );
 		gl.glPopMatrix();
 	}

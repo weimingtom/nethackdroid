@@ -52,7 +52,10 @@ public class NetHackIntroRenderer implements NetHackRenderer {
 	public void init(GL10 gl) {
 		_shieldTexture.finalize(gl);
 	}
+	
+	
 	private static float _rotation=0;
+	
 	public void render(GL10 gl) {
 		if( _startTime == 0 ) _startTime = java.lang.System.nanoTime();
 		gl.glPushMatrix();

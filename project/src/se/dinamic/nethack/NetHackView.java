@@ -163,13 +163,13 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
 	
 	gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA);
 	gl.glEnable(GL10.GL_BLEND);
-	
+	gl.glEnable(GL10.GL_COLOR_MATERIAL);
 	gl.glEnable(GL10.GL_TEXTURE_2D);
 	
 	// All objects rendered have varr, carr and textcoordarr soo this is put here
 	// for performance
 	gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-	//gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
+	gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 	gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 
   } 
