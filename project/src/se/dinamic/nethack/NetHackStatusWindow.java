@@ -20,6 +20,7 @@ package se.dinamic.nethack;
 
 import android.util.Log;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import javax.microedition.khronos.opengles.GL10;
@@ -48,7 +49,9 @@ public class NetHackStatusWindow implements NetHackWindow {
 	};
 	
 	private boolean _isDisplayed;
+	private boolean _isShowingFullStats;
 	private boolean _isDataChanged;
+	
 	
 	/** The player status object, holds all stats for the current player.. */
 	private final PlayerStatus _player = new PlayerStatus();
@@ -56,10 +59,21 @@ public class NetHackStatusWindow implements NetHackWindow {
 	/** Lock for access to the player data object... */
 	private final ReentrantLock _dataLock = new ReentrantLock();
 	
+	private final LinkedHashMap<String, FontAtlasTexture.String> _strings = new LinkedHashMap<String, FontAtlasTexture.String>();
+	
+	
+	public NetHackStatusWindow() {
+		_strings.put( "HITPOINTS",FontAtlasTexture.createString("HP") );
+		_strings.put( "POWER",FontAtlasTexture.createString("Pow") );
+		_strings.put( "GOLD",FontAtlasTexture.createString("Gold") );
+		_strings.put( "EXP",FontAtlasTexture.createString("Exp.") );
+	}
+	
 	public void display(int flag) { _isDisplayed = true; };
 	public void destroy() { };
 	public void handleGlyph(int x, int y,int glyph) {}
 	
+		
 	/** Parse the string into the player data object... */
 		// Goliat the Footpad      St:12 Dx:18 Co:15 In:10 Wi:12 Ch:10  Chaotic
 		// Dlvl:1  $:0  HP:11(11) Pw:2(2) AC:7  Exp:1
@@ -69,7 +83,6 @@ public class NetHackStatusWindow implements NetHackWindow {
 		Matcher matcher=pattern.matcher( str );
 		if( matcher.matches() ) {
 			_dataLock.lock();
-			Log.d(NetHack.LOGTAG,"NetHackStatusWindow.putStr() Got Dlvl match!!!");
 			_player.dungeonLevel = matcher.group(1).trim();	
 			_player.gold = Integer.valueOf( matcher.group(2));	
 			_player.currentHitPoints = Integer.valueOf( matcher.group(3));	
@@ -92,7 +105,7 @@ public class NetHackStatusWindow implements NetHackWindow {
 		}
 	};
 	
-	public void init(GL10 gl) {}
+	public void init(GL10 gl) { }
 	public void preInit() {}
 	
 	public FontAtlasTexture.String _rankAndLevel;
@@ -127,8 +140,10 @@ public class NetHackStatusWindow implements NetHackWindow {
 					gl.glOrthof(0, 1 / ratio, 0, 1, 0.0f, 10.0f);
 					
 				gl.glMatrixMode( gl.GL_MODELVIEW );
+				gl.glLoadIdentity();
+				
+				// Display name and rank top left
 				gl.glPushMatrix();
-					gl.glLoadIdentity();
 					gl.glTranslatef(0,1,0);
 					// Scale rendering of text...
 					gl.glScalef((tscale/2.0f),tscale,tscale);
@@ -136,6 +151,31 @@ public class NetHackStatusWindow implements NetHackWindow {
 					if(_rankAndLevel!=null)
 						_rankAndLevel.render(gl,0.8f);
 				gl.glPopMatrix();
+				
+				// Display health/power/exp/gold right
+				tscale=0.035f;
+				gl.glPushMatrix();
+					gl.glTranslatef(0.75f,1,0);
+					gl.glScalef((tscale/2.0f),tscale,tscale);
+					// HP and its bar
+					gl.glTranslatef(0,-1,0); _strings.get("HITPOINTS").render(gl,1.0f);
+					
+					// Power and bar
+					gl.glTranslatef(0,-1,0); _strings.get("POWER").render(gl,1.0f);
+					
+					
+					// Scale back to normal scale
+					//gl.glTranslatef(4,2,0);
+					//gl.glScalef(1.0f/tscale,1.0f,1.0f);
+					NetHackObjects.renderColoredQuad(gl,0.8f,0.0f,0.0f,1.0f);
+					
+					
+				gl.glPopMatrix();
+					
+				// Display other stats
+				if( _isShowingFullStats ) {
+					
+				}
 			
 				// Restore original PROJECTION matrix
 				gl.glMatrixMode( gl.GL_PROJECTION );

@@ -118,6 +118,29 @@ public class Texture {
 	/** Load resource texture from cache. */
 	public static ByteBuffer readCache(int resid) {
 		File f = new File("/sdcard/nethackdata/cache/texture"+resid+".cache");
+		return readCache(f);
+	}
+	
+	/** Store resource texture from cache. */
+	public static boolean storeCache(int resid,ByteBuffer data) {
+		File f = new File("/sdcard/nethackdata/cache/texture"+resid+".cache");
+		return storeCache( f, data);
+	}
+	
+	public static boolean storeCache(File f,ByteBuffer data) {
+		try {
+			Log.d(NetHack.LOGTAG,"Texture.storeCache() storing texture "+f.getName());
+			WritableByteChannel channel = new FileOutputStream( f ).getChannel();
+			channel.write( data );
+		} catch ( FileNotFoundException e ) {
+			return false;
+		} catch ( IOException e ) {
+			return false;
+		}		
+		return true;
+	}
+	
+	public static ByteBuffer readCache(File f) {
 		ByteBuffer data;
 		if( f.exists() ) {
 			Log.d(NetHack.LOGTAG,"Texture.readCache() found cached texture "+f.getName());
@@ -134,21 +157,6 @@ public class Texture {
 			}
 		} 
 		return null;
-	}
-	
-	/** Store resource texture from cache. */
-	public static boolean storeCache(int resid,ByteBuffer data) {
-		File f = new File("/sdcard/nethackdata/cache/texture"+resid+".cache");
-		try {
-			Log.d(NetHack.LOGTAG,"Texture.storeCache() storing texture "+f.getName());
-			WritableByteChannel channel = new FileOutputStream( f ).getChannel();
-			channel.write( data );
-		} catch ( FileNotFoundException e ) {
-			return false;
-		} catch ( IOException e ) {
-			return false;
-		}		
-		return true;
 	}
 	
 	public static Texture fromStream(  InputStream stream) {

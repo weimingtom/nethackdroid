@@ -31,6 +31,7 @@ import java.nio.ByteBuffer;
 import java.io.FileOutputStream;
 import java.lang.Math;
 import javax.microedition.khronos.opengles.GL10;
+import java.io.File;
 import java.io.FileNotFoundException;
 
 public class FontAtlasTexture {
@@ -126,13 +127,24 @@ public class FontAtlasTexture {
 	
 	public static void initialize() {
 		Log.d(NetHack.LOGTAG,"FontAtlasTexture.intialize()  generating font atlas.");
+		_data=null;
+		boolean _gotCachedBitmap=false;
+		
+		// Lets check if we have a cached fontmap texture of font/size
+		File f = new File("/sdcard/nethackdata/cache/fontmap.cache");
+		_data = Texture.readCache(f);
+		if( _data != null ) _gotCachedBitmap=true;
 		
 		// Generate the character atlas
-		Bitmap bm = Bitmap.createBitmap(ATLAS_SIZE, ATLAS_SIZE, Bitmap.Config.ARGB_8888);
-		Canvas bmc = new Canvas(bm);
+		Bitmap bm=null;
+		Canvas bmc=null;
+		if( !_gotCachedBitmap) {
+			bm = Bitmap.createBitmap(ATLAS_SIZE, ATLAS_SIZE, Bitmap.Config.ARGB_8888);
+			bmc = new Canvas(bm);
+		}
+		
 		Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
 		p.setTypeface(_typeFace);
-		
 		p.setTextSize(58);
 		
 		// Get the font metrics
@@ -155,7 +167,8 @@ public class FontAtlasTexture {
 			}
 			
 			// Draw character into bitmap
-			bmc.drawText(CHARACTERS,i ,i+1,x ,y ,p );
+			if( ! _gotCachedBitmap )
+				bmc.drawText(CHARACTERS,i ,i+1,x ,y ,p );
 			
 			// Set AtlasCharacter values and store it with char key.
 			ac.x=x/ATLAS_SIZE;
@@ -175,21 +188,26 @@ public class FontAtlasTexture {
 		}
 		
 		// Let's convert bitmap argb to rgba bytebuffer
-		_data = Texture.argb2rgba(bm);
+		if( !_gotCachedBitmap )
+			_data = Texture.argb2rgba(bm);
 		
 		
 		
 		// Debug save it to file..
-		try {
-			FileOutputStream stream = new FileOutputStream("/sdcard/fontatlas.png"); 
-			bm.compress(CompressFormat.PNG, 100, stream); 
-			stream.flush(); 
-			stream.close(); 
-		} catch (java.io.FileNotFoundException e) {
-		} catch (java.io.IOException e) {
-		}
+		if( ! _gotCachedBitmap ) {
+			try {
+				FileOutputStream stream = new FileOutputStream("/sdcard/fontatlas.png"); 
+				bm.compress(CompressFormat.PNG, 100, stream); 
+				stream.flush(); 
+				stream.close(); 
+				
+				 Texture.storeCache( f, _data );
+			} catch (java.io.FileNotFoundException e) {
+			} catch (java.io.IOException e) {
+			}
 		
-		bm.recycle();
+			bm.recycle();
+		}
 		Log.d(NetHack.LOGTAG,"FontAtlasTexture.intialize()  "+ _map.size() +" characters generated in atlas.");
 			
 	}
