@@ -139,7 +139,12 @@ public class NetHackWindowManager implements NetHackRenderer {
 			case NHW_STATUS:
 			{
 				Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() creating status window.");
-				//_windows.put(winid,new Window(winid,type,-0.001f, mw) );
+				NetHackStatusWindow sw=new NetHackStatusWindow();
+				Window win=new Window(winid,type,sw);
+				_windows.put(winid, win);
+				int index=0;
+				if(_windowRenderOrder.size() >= 1) index=1;
+				_windowRenderOrder.add(index,win);
 			} break;
 			case NHW_MENU:
 			{
