@@ -128,7 +128,10 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
 			NetHackRenderer r=(NetHackRenderer)_renderers.get(i);
 			r.preInit( );
 		}
-		  
+		
+		// Initialize helper class for 3d obejct rendering..
+		NetHackObjects.initialize();
+		
 		// Everything is initialized at this point lets
 		// wait for intro to finish then start nethack game...
 		while( ! _introRenderer.isIntroFinished() ) {
