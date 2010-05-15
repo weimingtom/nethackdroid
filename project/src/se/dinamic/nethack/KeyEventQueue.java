@@ -46,6 +46,8 @@ public class KeyEventQueue {
 	int key=0;
         try {
             switch(keysym) {
+		
+		
                 /*
                  * NAVIGATION KEY MAPPING
                  */
