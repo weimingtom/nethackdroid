@@ -82,6 +82,14 @@ public class NetHackWindowManager implements NetHackRenderer {
 		_windowRenderOrder = new ArrayList<Window>();
 	}
 	
+	public void zoomInMap() {
+		_mapWindow.zoomIn();
+	}
+	
+	public void zoomOutMap() {
+		_mapWindow.zoomOut();
+	}
+	
 	public void putStr(int winid,int attr, String str) {
 		Log.d(NetHack.LOGTAG,"NetHackWindowManager.putStr() window "+winid+" attributes "+attr+": '"+str+"'");
 		if( _windows.containsKey(winid) )

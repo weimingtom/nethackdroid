@@ -25,7 +25,7 @@ import android.util.Log;
 import android.os.Debug;
 import android.view.Window;
 import android.view.WindowManager;
-
+import android.content.pm.ActivityInfo;
 public class NetHack extends Activity 
 {
     public final static String LOGTAG="NetHackDroid";
@@ -34,8 +34,9 @@ public class NetHack extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-    
+	super.onCreate(savedInstanceState);
+	//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN ); 	    
     
