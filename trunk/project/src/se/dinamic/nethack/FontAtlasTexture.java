@@ -123,6 +123,7 @@ public class FontAtlasTexture {
 		gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, ATLAS_SIZE, ATLAS_SIZE, 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, _data);
 		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
 		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR); 
+		_data=null;
 	}
 	
 	public static void initialize() {

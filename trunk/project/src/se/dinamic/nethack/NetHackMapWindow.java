@@ -70,6 +70,7 @@ public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 		_planeVertices 		= FloatBuffer.wrap( PLANE_VERTICES, 0, PLANE_VERTICES.length  );
 		_planeTextureCoords	= FloatBuffer.wrap( PLANE_TEXTURE_COORDS, 0, PLANE_TEXTURE_COORDS.length );
 		_planeVertexColors	= FloatBuffer.wrap( VERTEX_COLORS, 0, VERTEX_COLORS.length );
+		NetHackSound.play("Wind",1.0f,true);
 	}
 	
 	public static void initialize(Resources resources) {
@@ -80,7 +81,10 @@ public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 	public void zoomIn() { _zoom+=1.0f; }
 	public void zoomOut() { _zoom+=-1.0f; }
 	
-	public void display(int flag) { _isDisplayed = true; };
+	public void display(int flag) { 
+		_isDisplayed = true; 
+	};
+	
 	public void destroy() { };
 	public void handleGlyph(int x, int y,int glyph) { super.handleGlyph(x,y,glyph); }
 	public void putStr(int attr,String str) {};

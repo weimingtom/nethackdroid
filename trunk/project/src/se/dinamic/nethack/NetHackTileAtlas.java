@@ -89,6 +89,7 @@ public class NetHackTileAtlas {
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, _texture[0] );
 		gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, ATLAS_WIDTH, ATLAS_HEIGHT, 0, ATLAS_PIXELFORMAT, GL10.GL_UNSIGNED_BYTE, _bitmapdata);
 		Log.d(NetHack.LOGTAG,"NetHackTileAtlas.generate() finished.");
+		_bitmapdata=null;
 	}
 	
 	public void generateTextureCoords( int index, FloatBuffer textureCoords ) {

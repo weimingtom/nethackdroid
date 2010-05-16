@@ -22,13 +22,15 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.content.Context;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class NetHackSound {
 	private boolean _isAmbientLoaded=false;
 	private static SoundPool _soundPoolEffects;
 	private static Context _context;
 	private static final ArrayList<SoundEffect> _soundEffects=new ArrayList<SoundEffect>();
-		
+	private static final LinkedHashMap<String,Integer> _ambient=new LinkedHashMap<String,Integer>();
+	
 	private static class SoundEffect {
 		private String _regex;
 		private SoundPool _soundPoolEffects;
@@ -65,18 +67,20 @@ public class NetHackSound {
 		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.door_bump, 0.5f, "That door is closed." ) );
 		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.door_bump, 0.7f, ".*You bump into a door." ) );
 		
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.fight_miss, 0.7f, "You miss .*" ) );
 		
 		
 		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.footsteps_marching, 1.0f, "You hear the footsteps of a guard on patrol." ) );
 		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.fx_water_splash, 1.0f, "You hear the splashing of a naiad." ) );
 		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.fx_gurgle, 1.0f, "You hear a gurgling noise." ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.fx_boulder, 1.0f, ".*boulder.*") );
 		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.water_bubbles, 0.8f, "You hear bubbling water." ) );
 		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.coins_counting, 0.7f, "You hear someone counting money." ) );
 		
 		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.fight_male_aah, 0.6f, "The .* bites!" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.fight_male_aaou, 0.6f, "The .* bites!" ) );
-	
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.fight_male_aaou, 0.6f, "The .* hits.*" ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.fight_miss, 0.7f, "(You miss .*|The .* misses.*)" ) );
+		
+		
 		
 		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.crack, 1.0f, ".*it crashes open.*" ) );
 		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.crack, 1.0f, "The door crashes open.*" ) );
@@ -112,15 +116,21 @@ public class NetHackSound {
 		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.swing, 1.0f, ".*The .* misses.*" ) );
 		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.slop, 1.0f, "*You are splashed by*" ) );
 		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.evil, 1.0f, "*You die..." ) );
+		
+		_ambient.put("Wind",_soundPoolEffects.load(_context, R.raw.ambient_wind,0));
+		_ambient.put("Rock1",_soundPoolEffects.load(_context, R.raw.ambient_rock1,0));
+		_ambient.put("Rock2",_soundPoolEffects.load(_context, R.raw.ambient_rock2,0));
+		_ambient.put("Rock3",_soundPoolEffects.load(_context, R.raw.ambient_rock3,0));
+		
+	}
+	
+	public static void play(String sound,float volume,boolean loop) {
+		int l=0;
+		if(loop) l=-1;
+		_soundPoolEffects.play(_ambient.get(sound),volume,volume, 0, l, 1.0f);
 	}
 	
 	public void putStr(int attr,String str) {
-		
-		if( !_isAmbientLoaded ) {
-			int id=_soundPoolEffects.load(_context, R.raw.ambient_wind,0);
-			_soundPoolEffects.play(id,0.8f,0.8f,0,-1,1.0f);
-			_isAmbientLoaded=true;
-		}
 		
 		for(int i=0;i<_soundEffects.size();i++) 
 			if( _soundEffects.get(i).playEffect(str) ) break;
