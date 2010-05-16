@@ -48,9 +48,10 @@ public class NetHackStatusWindow implements NetHackWindow {
 		public String hungerStatus;
 	};
 	
-	private boolean _isDisplayed;
+	private boolean _isDisplayed=false;
 	private boolean _isShowingFullStats;
 	private boolean _isDataChanged;
+	private boolean _isDataInitialized=false;
 	
 	
 	/** The player status object, holds all stats for the current player.. */
@@ -83,6 +84,7 @@ public class NetHackStatusWindow implements NetHackWindow {
 		Matcher matcher=pattern.matcher( str );
 		if( matcher.matches() ) {
 			_dataLock.lock();
+			_isDataInitialized=true;
 			_player.dungeonLevel = matcher.group(1).trim();	
 			_player.gold = Integer.valueOf( matcher.group(2));	
 			_player.currentHitPoints = Integer.valueOf( matcher.group(3));	
@@ -120,8 +122,8 @@ public class NetHackStatusWindow implements NetHackWindow {
 		_dataLock.unlock();
 		
 			
-		if( _isDisplayed ) {
-			
+		if(   _isDataInitialized && _isDisplayed ) {
+				
 			// Render status...
 			float tscale=0.055f;
 		  
@@ -152,23 +154,37 @@ public class NetHackStatusWindow implements NetHackWindow {
 						_rankAndLevel.render(gl,0.8f);
 				gl.glPopMatrix();
 				
+					
 				// Display health/power/exp/gold right
 				tscale=0.035f;
 				gl.glPushMatrix();
 					gl.glTranslatef(0.75f,1,0);
+					
+					// First render hpscale then add texts..
+					gl.glPushMatrix();
+						gl.glScalef(0.25f,tscale,tscale);
+						gl.glTranslatef(0,-1,0); 
+						gl.glScalef(1,0.8f,1);
+						NetHackObjects.renderColoredQuad(gl,0.3f,0.0f,0.0f,0.4f);
+						gl.glScalef(_player.currentHitPoints/_player.totalHitPoints,0.9f,1);
+						NetHackObjects.renderColoredQuad(gl,0.8f,0.0f,0.0f,0.3f);
+					gl.glPopMatrix();
+					
+					gl.glPushMatrix();
+						gl.glScalef(0.25f,tscale,tscale);
+						gl.glTranslatef(0,-2,0); 
+						gl.glScalef(1,0.8f,1);
+						NetHackObjects.renderColoredQuad(gl,0.0f,0.0f,0.3f,0.4f);
+						gl.glScalef(_player.currentPower/_player.totalPower,0.9f,1);
+						NetHackObjects.renderColoredQuad(gl,0.0f,0.0f,0.8f,0.3f);
+					gl.glPopMatrix();
+					
 					gl.glScalef((tscale/2.0f),tscale,tscale);
 					// HP and its bar
 					gl.glTranslatef(0,-1,0); _strings.get("HITPOINTS").render(gl,1.0f);
 					
 					// Power and bar
 					gl.glTranslatef(0,-1,0); _strings.get("POWER").render(gl,1.0f);
-					
-					
-					// Scale back to normal scale
-					//gl.glTranslatef(4,2,0);
-					//gl.glScalef(1.0f/tscale,1.0f,1.0f);
-					NetHackObjects.renderColoredQuad(gl,0.8f,0.0f,0.0f,1.0f);
-					
 					
 				gl.glPopMatrix();
 					
