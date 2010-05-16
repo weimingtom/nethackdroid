@@ -123,17 +123,21 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
 	  }
 	  
 	  public void run() {
-		Log.d(NetHack.LOGTAG,"NetHackView.InitializeRenderersJob.run() Running pre-initialization of renderers job.");
-		for(int i=0;i<_renderers.size();i++) {
-			NetHackRenderer r=(NetHackRenderer)_renderers.get(i);
-			r.preInit( );
-		}
+		  
+		// intialize the fontatlastexture 
+		FontAtlasTexture.initialize();
 		
 		// Load sound 
 		NetHackSound.initialize();
 		
 		// Initialize helper class for 3d obejct rendering..
 		NetHackObjects.initialize();
+		  
+		Log.d(NetHack.LOGTAG,"NetHackView.InitializeRenderersJob.run() Running pre-initialization of renderers job.");
+		for(int i=0;i<_renderers.size();i++) {
+			NetHackRenderer r=(NetHackRenderer)_renderers.get(i);
+			r.preInit( );
+		}
 		
 		// Everything is initialized at this point lets
 		// wait for intro to finish then start nethack game...
