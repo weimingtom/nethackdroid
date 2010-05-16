@@ -251,6 +251,7 @@ public class Texture {
 		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR); 
 		_textureRatio = (_width/_height);
 		_isFinalized=true;
+		_data=null;
 		// Free _data
 	}
 	
