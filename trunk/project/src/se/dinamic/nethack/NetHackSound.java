@@ -26,7 +26,6 @@ import java.util.ArrayList;
 public class NetHackSound {
 	private boolean _isAmbientLoaded=false;
 	private static SoundPool _soundPoolEffects;
-	private static SoundPool _soundPoolAmbient;
 	private static Context _context;
 	private static final ArrayList<SoundEffect> _soundEffects=new ArrayList<SoundEffect>();
 		
@@ -55,7 +54,6 @@ public class NetHackSound {
 	public NetHackSound(Context context) {
 		_context=context;
 		_soundPoolEffects = new SoundPool( 15, AudioManager.STREAM_MUSIC, 0);
-		//_soundPoolAmbient = new SoundPool( 15, AudioManager.STREAM_MUSIC, 0);
 	}
 	
 	public static void initialize() {
@@ -65,7 +63,20 @@ public class NetHackSound {
 		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.door_open, 0.6f, "You hear a door open." ) );
 		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.door_close, 1.0f, "The door closes." ) );
 		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.door_bump, 0.5f, "That door is closed." ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.door_bump, 0.7f, "You bumped into a door." ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.door_bump, 0.7f, ".*You bump into a door." ) );
+		
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.fight_miss, 0.7f, "You miss .*" ) );
+		
+		
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.footsteps_marching, 1.0f, "You hear the footsteps of a guard on patrol." ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.fx_water_splash, 1.0f, "You hear the splashing of a naiad." ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.fx_gurgle, 1.0f, "You hear a gurgling noise." ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.water_bubbles, 0.8f, "You hear bubbling water." ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.coins_counting, 0.7f, "You hear someone counting money." ) );
+		
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.fight_male_aah, 0.6f, "The .* bites!" ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.fight_male_aaou, 0.6f, "The .* bites!" ) );
+	
 		
 		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.crack, 1.0f, ".*it crashes open.*" ) );
 		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.crack, 1.0f, "The door crashes open.*" ) );
@@ -80,11 +91,9 @@ public class NetHackSound {
 		
 		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.metal, 1.0f, "Klunk!" ) );
 		
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.water_bubbles, 0.8f, "You hear bubbling water." ) );
 		
 		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.coins_pickup, 1.0f, ".* gold pieces." ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.coins_counting, 0.6f, "You hear someone counting money." ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.coins_drop, 0.3f, "Your purse feels lighter."  ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.coins_drop, 0.5f, "Your purse feels lighter."  ) );
 		
 		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.chain, 1.0f, ".*punished for your misbehavior.*"  ) );
 		

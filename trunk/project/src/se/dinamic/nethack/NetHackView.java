@@ -123,12 +123,13 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
 	  }
 	  
 	  public void run() {
+		// Load sound 
+		NetHackSound.initialize();
 		  
 		// intialize the fontatlastexture 
 		FontAtlasTexture.initialize();
 		
-		// Load sound 
-		NetHackSound.initialize();
+	
 		
 		// Initialize helper class for 3d obejct rendering..
 		NetHackObjects.initialize();
