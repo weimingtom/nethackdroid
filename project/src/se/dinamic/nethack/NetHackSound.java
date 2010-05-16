@@ -24,7 +24,9 @@ import android.content.Context;
 import java.util.ArrayList;
 
 public class NetHackSound {
+	private boolean _isAmbientLoaded=false;
 	private static SoundPool _soundPoolEffects;
+	private static SoundPool _soundPoolAmbient;
 	private static Context _context;
 	private static final ArrayList<SoundEffect> _soundEffects=new ArrayList<SoundEffect>();
 		
@@ -53,55 +55,64 @@ public class NetHackSound {
 	public NetHackSound(Context context) {
 		_context=context;
 		_soundPoolEffects = new SoundPool( 15, AudioManager.STREAM_MUSIC, 0);
-	
-	
+		//_soundPoolAmbient = new SoundPool( 15, AudioManager.STREAM_MUSIC, 0);
 	}
 	
 	public static void initialize() {
-			
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.lock, 1.0f, "This door is locked." ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.lock, 1.0f, "This door is locked." ) );
 		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.door1, 1.0f, "The door resists!" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.door2, 1.0f, "The door opens." ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.door2, 1.0f, "You hear a door open." ) );
-		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.door3, 1.0f, "The door closes." ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.door_open, 1.0f, "The door opens." ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.door_open, 0.6f, "You hear a door open." ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.door_close, 1.0f, "The door closes." ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.door_bump, 0.5f, "That door is closed." ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.door_bump, 0.7f, "You bumped into a door." ) );
 		
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.crack, 1.0f, ".*it crashes open.*" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.crack, 1.0f, "The door crashes open.*" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.crack, 1.0f, ".*The door splinters!.*" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.crack, 1.0f, ".*door .* shatters*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.crack, 1.0f, ".*it crashes open.*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.crack, 1.0f, "The door crashes open.*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.crack, 1.0f, ".*The door splinters!.*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.crack, 1.0f, ".*door .* shatters*" ) );
 		
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.creak, 1.0f, "You carefully open the .*" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.lock, 1.0f, "Hmmm, it seems to be locked." ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.slams, 1.0f, ".*slams open.*" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.crack, 1.0f, ".*slams open.*" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.thud, 1.0f, "THUD!" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.creak, 1.0f, "You carefully open the .*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.lock, 1.0f, "Hmmm, it seems to be locked." ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.slams, 1.0f, ".*slams open.*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.crack, 1.0f, ".*slams open.*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.thud, 1.0f, "THUD!" ) );
 		
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.metal, 1.0f, "Klunk!" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.metal, 1.0f, "Klunk!" ) );
 		
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.coins, 1.0f, ".* gold pieces." ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.coinsfall, 0.6f, "You hear someone counting money." ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.coins, 0.3f, "Your purse feels lighter."  ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.water_bubbles, 0.8f, "You hear bubbling water." ) );
 		
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.chain, 1.0f, ".*punished for your misbehavior.*"  ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.coins_pickup, 1.0f, ".* gold pieces." ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.coins_counting, 0.6f, "You hear someone counting money." ) );
+		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.coins_drop, 0.3f, "Your purse feels lighter."  ) );
 		
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.hit1, 1.0f, ".*You hit the.*"  ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.hit1, 1.0f,  ".*You smite the.*" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.hit1, 1.0f, ".*You kick the.*" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.hit2, 1.0f, ".*You destroy the.*" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.hit2, 1.0f, ".*You kill the.*" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.scream1, 1.0f, ".*The .* hits.*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.chain, 1.0f, ".*punished for your misbehavior.*"  ) );
+		
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.hit1, 1.0f, ".*You hit the.*"  ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.hit1, 1.0f,  ".*You smite the.*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.hit1, 1.0f, ".*You kick the.*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.hit2, 1.0f, ".*You destroy the.*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.hit2, 1.0f, ".*You kill the.*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.scream1, 1.0f, ".*The .* hits.*" ) );
 		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.growl, 1.0f, "*The * bites*" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.hit1, 1.0f, ".*bits the.*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.hit1, 1.0f, ".*bits the.*" ) );
 		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.growl, 1.0f, "*bites the*" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.ouch, 1.0f, ".*Ouch!.*" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.spark, 1.0f, ".*You get zapped.*" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.swing, 1.0f, ".*You miss the.*" ) );
-		_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.swing, 1.0f, ".*The .* misses.*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.ouch, 1.0f, ".*Ouch!.*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.spark, 1.0f, ".*You get zapped.*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.swing, 1.0f, ".*You miss the.*" ) );
+		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.swing, 1.0f, ".*The .* misses.*" ) );
 		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.slop, 1.0f, "*You are splashed by*" ) );
 		//_soundEffects.add( new SoundEffect(_soundPoolEffects, _context, R.raw.evil, 1.0f, "*You die..." ) );
 	}
 	
 	public void putStr(int attr,String str) {
+		
+		if( !_isAmbientLoaded ) {
+			int id=_soundPoolEffects.load(_context, R.raw.ambient_wind,0);
+			_soundPoolEffects.play(id,0.8f,0.8f,0,-1,1.0f);
+			_isAmbientLoaded=true;
+		}
+		
 		for(int i=0;i<_soundEffects.size();i++) 
 			if( _soundEffects.get(i).playEffect(str) ) break;
 	};

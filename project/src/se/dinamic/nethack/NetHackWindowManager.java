@@ -210,8 +210,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 	
 	public void preInit() {
 		Log.d(NetHack.LOGTAG,"NetHackWindowManager.preInit() Pre intialize window manager renderer.");
-		// intialize the fontatlastexture 
-		FontAtlasTexture.initialize();
+		
 		
 		// initialize tile atlas for map window
 		NetHackMapWindow.initialize(_resources);
