@@ -44,8 +44,23 @@ public class NetHackObjects {
 		_planeTextureCoords	= FloatBuffer.wrap( PLANE_TEXTURE_COORDS, 0, PLANE_TEXTURE_COORDS.length );
 	}
 	
+	public static void renderTexturedQuad(GL10 gl,int texture, float alpha) {
+		// Disable texture and color array
+		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+		gl.glEnable( GL10.GL_TEXTURE_2D );
+		gl.glBindTexture( GL10.GL_TEXTURE_2D, texture );
+		
+		gl.glColor4f(1,1,1,alpha);
+		gl.glTexCoordPointer(3, gl.GL_FLOAT, 0, _planeTextureCoords);
+		gl.glVertexPointer(3, gl.GL_FLOAT, 0, _planeVertices);
+		gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, 4 );
+		
+	}
+	
 	public static void renderColoredQuad(GL10 gl,float red,float green,float blue, float alpha) {
 		// Disable texture and color array
+		gl.glDisable(GL10.GL_TEXTURE_2D);
 		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		
@@ -56,6 +71,7 @@ public class NetHackObjects {
 		// go back to default enabled...
 		gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+		gl.glEnable(GL10.GL_TEXTURE_2D);
 	}
 	
 }
