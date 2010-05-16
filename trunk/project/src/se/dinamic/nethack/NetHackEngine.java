@@ -34,13 +34,15 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
     private KeyEventQueue _keyevent;
     private static NetHackView _view;
     private NetHackWindowManager _wm;
-    
+    private NetHackSound _sound;
+	
     public NetHackEngine(Activity context) 
    {
 	_context=context;
 	// Setup view
+	_sound = new NetHackSound( context );
 	_wm = new NetHackWindowManager(context.getResources());
-	_view = new NetHackView(context);
+	_view = new NetHackView( context );
 	_keyevent = new KeyEventQueue();
          
 	
@@ -83,7 +85,10 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
         toast.show();
     }
     
-    public void onPutStr(int winid,int attr,String status) { _wm.putStr( winid, attr, status); }
+    public void onPutStr(int winid,int attr,String status) { 
+	    _sound.putStr( attr, status );
+	    _wm.putStr( winid, attr, status);	    
+    }
     
     public void onPrintGlyph(int winid,int x,int y,int glyph) { _wm.handleGlyph( winid, x, y, glyph ); }
    
