@@ -129,6 +129,9 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
 			r.preInit( );
 		}
 		
+		// Load sound 
+		NetHackSound.initialize();
+		
 		// Initialize helper class for 3d obejct rendering..
 		NetHackObjects.initialize();
 		
