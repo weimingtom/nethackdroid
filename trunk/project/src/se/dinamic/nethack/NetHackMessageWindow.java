@@ -112,12 +112,8 @@ public class NetHackMessageWindow implements NetHackWindow {
 				gl.glDisable( gl.GL_DEPTH_TEST);
 					
 				gl.glLoadIdentity();
-				// gl.glOrthof(0.0f,parent.getWidth(),0.0f,-parent.getHeight(),0.0f,10.0f);
 				float ratio = NetHackWindowManager.screenWidth / NetHackWindowManager.screenHeight;
-				if(ratio > 1.0 ) // Landscape
-					gl.glOrthof(0, 1, 0, 1 / ratio, 0.0f, 10.0f);
-				else // Portrait
-					gl.glOrthof(0, 1 / ratio, 0, 1, 0.0f, 10.0f);
+				gl.glOrthof(0, 1, 0, 1.0f/ratio , 0.0f, 10.0f);
 					
 				gl.glMatrixMode( gl.GL_MODELVIEW );
 				gl.glPushMatrix();
