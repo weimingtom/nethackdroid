@@ -81,11 +81,11 @@ public class FontAtlasTexture {
 		public float getWidth() { return _width; };
 		
 		/** Render string on GL */
-		public void render( GL10 gl, float alpha ) {
+		public void render( GL10 gl, float x, float y, float alpha ) {
 			gl.glPushMatrix();
 			gl.glEnable( GL10.GL_TEXTURE_2D );
 			gl.glBindTexture( GL10.GL_TEXTURE_2D, _texture );
-			
+			gl.glTranslatef(x,y,0);
 			// setup vertext colorarray with alpha
 			if( alpha != _alpha ) {
 				int entries=_vertexColors.capacity();
@@ -121,8 +121,8 @@ public class FontAtlasTexture {
 		gl.glGenTextures( 1, _texture, 0); 
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, _texture[0] );
 		gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, ATLAS_SIZE, ATLAS_SIZE, 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, _data);
-		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
-		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR); 
+		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
+		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_NEAREST); 
 		_data=null;
 	}
 	
@@ -134,7 +134,10 @@ public class FontAtlasTexture {
 		// Lets check if we have a cached fontmap texture of font/size
 		File f = new File("/sdcard/nethackdata/cache/fontmap.cache");
 		_data = Texture.readCache(f);
-		if( _data != null ) _gotCachedBitmap=true;
+		if( _data != null ) {
+			Log.d(NetHack.LOGTAG,"FontAtlasTexture.intialize()  Cached texture of fontatlas loaded.");
+			_gotCachedBitmap=true;
+		}
 		
 		// Generate the character atlas
 		Bitmap bm=null;
@@ -157,6 +160,7 @@ public class FontAtlasTexture {
 		
 		// Let's render all characters in CHARACTERS into the canvas
 		float x=ATLAS_MARGIN,y=ATLAS_MARGIN+_characterHeight;
+		float ac_height=((_characterHeight+ATLAS_MARGIN)/ATLAS_SIZE);
 		for(int i=0;i<CHARACTERS.length();i++) {
 			AtlasCharacter ac=new AtlasCharacter();
 			ac.width = p.measureText(CHARACTERS,i,i+1);	
@@ -179,13 +183,15 @@ public class FontAtlasTexture {
 			x+=ATLAS_MARGIN;
 			
 			ac.width=ac.width/ATLAS_SIZE;
-			ac.height=(_characterHeight+ATLAS_MARGIN)/ATLAS_SIZE;
+			ac.height=ac_height;
 			
 			_map.put((int)CHARACTERS.charAt(i), ac);
 			
 			
 			if(_characterWidth<ac.width)
 				_characterWidth=ac.width;
+			
+			Log.d(NetHack.LOGTAG,"FontAtlasTexture.initialize() Char '"+CHARACTERS.charAt(i)+"' width "+ac.width+" height "+ac.height);
 		}
 		
 		// Let's convert bitmap argb to rgba bytebuffer
@@ -232,9 +238,9 @@ public class FontAtlasTexture {
 			if( _map.containsKey((int)text.charAt(i)) ) 
 			{
 				AtlasCharacter ac =_map.get((int)text.charAt(i));
-				width+=ac.width;
+				width += ( ac.width / ac.height );
 			
-				float cw = 1.0f * (ac.width / _characterWidth);
+				float cw = ac.width/ac.height;
 				varr.put(vi,x);  varr.put(vi+1,1.0f);  varr.put(vi+2,0.0f);
 				varr.put(vi+3,x);  varr.put(vi+4,0.0f);  varr.put(vi+5,0.0f);
 				varr.put(vi+6,x+cw);  varr.put(vi+7,0.0f);  varr.put(vi+8,0.0f);

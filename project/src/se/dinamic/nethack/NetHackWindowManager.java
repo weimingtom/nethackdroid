@@ -120,7 +120,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 	public int create( int type ) {
 		
 		int winid = generateWindowID();
-		Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() new window"+winid);
+		Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() create new window type "+type+" id "+winid);
 		_collectionLock.lock();
 		switch(type) {
 			case NHW_MAP:
@@ -141,7 +141,8 @@ public class NetHackWindowManager implements NetHackRenderer {
 				Window win=new Window(winid,type,mw);
 				_windows.put(winid, win);
 				int index=0;
-				if(_windowRenderOrder.size() >= 1) index=1;
+				if(_windowRenderOrder.size() >= 1) 
+					index=1;
 				_windowRenderOrder.add(index,win);
 			} break;
 			case NHW_STATUS:
@@ -151,7 +152,8 @@ public class NetHackWindowManager implements NetHackRenderer {
 				Window win=new Window(winid,type,sw);
 				_windows.put(winid, win);
 				int index=0;
-				if(_windowRenderOrder.size() >= 1) index=1;
+				if(_windowRenderOrder.size() >= 1) 
+					index=1;
 				_windowRenderOrder.add(index,win);
 			} break;
 			case NHW_MENU:
@@ -167,7 +169,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 				_windowRenderOrder.add(win);
 			} break;
 			default:
-				
+				Log.d(NetHack.LOGTAG,"NetHackWindowManager.create() Unhandled window type "+type);
 			break;
 		}
 		_collectionLock.unlock();
@@ -211,7 +213,6 @@ public class NetHackWindowManager implements NetHackRenderer {
 	public void preInit() {
 		Log.d(NetHack.LOGTAG,"NetHackWindowManager.preInit() Pre intialize window manager renderer.");
 		
-		
 		// initialize tile atlas for map window
 		NetHackMapWindow.initialize(_resources);
 		
@@ -229,34 +230,12 @@ public class NetHackWindowManager implements NetHackRenderer {
 			_isFontInitialized=true;
 		}
 		
-		// Check if we got a modal window showing
-		//if( isModalWindow() ) {
-			// We are showing a modal window lets render it..
-		//	_modalWindow.window.render( gl );
-		//} else {
-			// Run thru all window and render them...
-			_collectionLock.lock();
-			
-			for( int i=0;i<_windowRenderOrder.size();i++) {
-				_windowRenderOrder.get(i).window.render( gl );
-			}
-			
-			/*Set ws=_windows.entrySet();
-			Iterator<Entry> it = ws.iterator();
-			if( it.hasNext() ) {			
-				do {
-					Entry<Integer,Window> e = it.next();
-					Window w = e.getValue();
-					// render the window..
-					gl.glTranslatef(0,0,w.z);
-					w.window.render( gl );
-					gl.glTranslatef(0,0,-w.z);
-				} while( it.hasNext() );
-			}	*/
-			_collectionLock.unlock();			
-		//}
-		
-		
+		// Run thru all window and render them...
+		_collectionLock.lock();
+		for( int i=0;i<_windowRenderOrder.size();i++) {
+			_windowRenderOrder.get(i).window.render( gl );
+		}
+		_collectionLock.unlock();			
 	}
 	
 }

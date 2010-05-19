@@ -148,15 +148,14 @@ public class NetHackStatusWindow implements NetHackWindow {
 				gl.glPushMatrix();
 					gl.glTranslatef(0,1,0);
 					// Scale rendering of text...
-					gl.glScalef((tscale/2.0f),tscale,tscale);
-					gl.glTranslatef(0,-1,0);
+					gl.glScalef(tscale,tscale,tscale);
 					if(_rankAndLevel!=null)
-						_rankAndLevel.render(gl,0.8f);
+						_rankAndLevel.render( gl, 0, -1, 0.8f );
 				gl.glPopMatrix();
 				
 					
 				// Display health/power/exp/gold right
-				tscale=0.035f;
+				tscale=0.05f;
 				gl.glPushMatrix();
 					gl.glTranslatef(0.75f,1,0);
 					
@@ -179,12 +178,13 @@ public class NetHackStatusWindow implements NetHackWindow {
 						NetHackObjects.renderColoredQuad(gl,0.0f,0.0f,0.8f,0.3f);
 					gl.glPopMatrix();
 					
-					gl.glScalef((tscale/2.0f),tscale,tscale);
+					gl.glScalef(tscale,tscale,tscale);
+					
 					// HP and its bar
-					gl.glTranslatef(0,-1,0); _strings.get("HITPOINTS").render(gl,1.0f);
+					_strings.get("HITPOINTS").render(gl, -_strings.get("HITPOINTS").getWidth(), -1, 1.0f);
 					
 					// Power and bar
-					gl.glTranslatef(0,-1,0); _strings.get("POWER").render(gl,1.0f);
+					_strings.get("POWER").render(gl,-_strings.get("POWER").getWidth(), -2, 1.0f);
 					
 				gl.glPopMatrix();
 					

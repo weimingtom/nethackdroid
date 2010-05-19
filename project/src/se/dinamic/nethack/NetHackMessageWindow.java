@@ -113,7 +113,7 @@ public class NetHackMessageWindow implements NetHackWindow {
 					
 				gl.glLoadIdentity();
 				// gl.glOrthof(0.0f,parent.getWidth(),0.0f,-parent.getHeight(),0.0f,10.0f);
-				float ratio=NetHackWindowManager.screenWidth/NetHackWindowManager.screenHeight;
+				float ratio = NetHackWindowManager.screenWidth / NetHackWindowManager.screenHeight;
 				if(ratio > 1.0 ) // Landscape
 					gl.glOrthof(0, 1, 0, 1 / ratio, 0.0f, 10.0f);
 				else // Portrait
@@ -138,14 +138,13 @@ public class NetHackMessageWindow implements NetHackWindow {
 					gl.glPopMatrix();
 				
 					// Scale rendering of text...
-					gl.glScalef((tscale/2.0f),tscale,tscale);
+					gl.glScalef(tscale,tscale,tscale);
 					
 					for(int i=0; i < DISPLAY_LOG_ENTRIES; i++) {
 						if( _log.size() == 0) break;
 						int ioffs = (_log.size()-1) - i;
 						if( ioffs>0 ) { // Render log entry
-							_log.get(ioffs).render(gl,1.0f-((1.0f/DISPLAY_LOG_ENTRIES)*i));
-							gl.glTranslatef(0,1,0);
+							_log.get(ioffs).render(gl, 0, i, 1.0f-((1.0f/DISPLAY_LOG_ENTRIES)*i));
 						} else // No more entries to show let's breakout
 							break;
 					}
