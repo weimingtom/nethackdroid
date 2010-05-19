@@ -116,7 +116,7 @@ public class NetHackStatusWindow implements NetHackWindow {
 		_dataLock.lock();
 		if( _isDataChanged ) {
 			// Update strings that is to be rendered...
-			_rankAndLevel = FontAtlasTexture.createString(_player.rank+" in dungeon level "+_player.dungeonLevel );
+			_rankAndLevel = FontAtlasTexture.createString(_player.rank+" in dungeon "+_player.dungeonLevel );
 			_isDataChanged=false;
 		}
 		_dataLock.unlock();
@@ -125,7 +125,7 @@ public class NetHackStatusWindow implements NetHackWindow {
 		if(   _isDataInitialized && _isDisplayed ) {
 				
 			// Render status...
-			float tscale=0.055f;
+			float tscale=0.05f;
 		  
 			// Store Original PROJECTION matrix before changing it
 			gl.glMatrixMode( gl.GL_PROJECTION );
@@ -134,12 +134,9 @@ public class NetHackStatusWindow implements NetHackWindow {
 				gl.glDisable( gl.GL_DEPTH_TEST);
 					
 				gl.glLoadIdentity();
-				// gl.glOrthof(0.0f,parent.getWidth(),0.0f,-parent.getHeight(),0.0f,10.0f);
 				float ratio=NetHackWindowManager.screenWidth/NetHackWindowManager.screenHeight;
-				if(ratio > 1.0 ) // Landscape
-					gl.glOrthof(0, 1, 0, 1 / ratio, 0.0f, 10.0f);
-				else // Portrait
-					gl.glOrthof(0, 1 / ratio, 0, 1, 0.0f, 10.0f);
+				gl.glOrthof(0, 1, 0, 1 / ratio, 0.0f, 10.0f);
+				
 					
 				gl.glMatrixMode( gl.GL_MODELVIEW );
 				gl.glLoadIdentity();
@@ -150,12 +147,12 @@ public class NetHackStatusWindow implements NetHackWindow {
 					// Scale rendering of text...
 					gl.glScalef(tscale,tscale,tscale);
 					if(_rankAndLevel!=null)
-						_rankAndLevel.render( gl, 0, -1, 0.8f );
+						_rankAndLevel.render( gl, 0, -1, 1.0f );
 				gl.glPopMatrix();
 				
 					
 				// Display health/power/exp/gold right
-				tscale=0.05f;
+				tscale=0.035f;
 				gl.glPushMatrix();
 					gl.glTranslatef(0.75f,1,0);
 					
