@@ -26,4 +26,7 @@ public interface NetHackRenderer {
 	public void init(GL10 gl);
 	/** the actual rendering of content...*/
 	public void render(GL10 gl);
+	
+	/** the animation clock...*/
+	public void clock(long time);
 }

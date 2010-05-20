@@ -56,9 +56,16 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
     //FontAtlasTexture._typeFace = Typeface.createFromAsset(context.getAssets(), "fonts/Isabella.ttf") ;
     FontAtlasTexture._typeFace = Typeface.create(Typeface.SANS_SERIF,Typeface.NORMAL);
 
+    // Initialize helper class for 3d obejct rendering..
+    NetHackObjects.initialize();
+        
+	  
     // Create the intro renderer
     _introRenderer = new NetHackIntroRenderer( _context.getResources() );
     _introRenderer.preInit( );
+	  
+    RendererClockThread job=new RendererClockThread(_introRenderer,_renderers);
+    job.start();
       
     
       
@@ -119,6 +126,35 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
       }
   }
   
+  private static class RendererClockThread extends Thread {
+	NetHackIntroRenderer _introRenderer;
+	private Vector<NetHackRenderer> _renderers;
+	
+	public RendererClockThread( NetHackIntroRenderer introRenderer, Vector<NetHackRenderer> renderers ) {
+		_renderers = renderers;
+		_introRenderer=introRenderer;
+        }
+	
+	public void run() {
+		while(true) {
+			try {
+				Thread.sleep(10);
+			} catch(InterruptedException e) {
+			}
+			
+			long time=0;
+			_introRenderer.clock( time );
+			for(int i=0;i<_renderers.size();i++) {
+				NetHackRenderer r=(NetHackRenderer)_renderers.get(i);
+				r.clock( time );
+			}
+		}
+	}
+  }
+
+
+  
+  
   private static class InitializeRenderersJob extends Thread {
       private Vector<NetHackRenderer> _renderers;
       private Resources _resources;
@@ -133,21 +169,22 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
       
       public void run() {
         // Load sound 
-        NetHackSound.initialize();
+	NetHackSound.initialize();
+        NetHackIntroRenderer.progress(0.25f);
           
         // intialize the fontatlastexture 
         FontAtlasTexture.initialize();
-        
-        // Initialize helper class for 3d obejct rendering..
-        NetHackObjects.initialize();
+        NetHackIntroRenderer.progress(0.25f);
           
         // Initialize userinterface renderer...
         NetHackUserInterfaceRenderer.initialize( _resources );
+        NetHackIntroRenderer.progress(0.25f);
         
         Log.d(NetHack.LOGTAG,"NetHackView.InitializeRenderersJob.run() Running pre-initialization of renderers job.");
         for(int i=0;i<_renderers.size();i++) {
             NetHackRenderer r=(NetHackRenderer)_renderers.get(i);
             r.preInit( );
+   	    NetHackIntroRenderer.progress(0.25f/_renderers.size());
         }
         
         // Everything is initialized at this point lets

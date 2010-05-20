@@ -75,7 +75,7 @@ public class NetHackMessageWindow implements NetHackWindow {
 	
 	public void init(GL10 gl) { }
 	public void preInit() { }
-	
+	public void clock(long time) {}
 	public void display(int flag) { _isDisplayed = true; };
 	public void destroy() {};
 	

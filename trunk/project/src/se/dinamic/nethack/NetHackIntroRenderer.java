@@ -21,7 +21,7 @@ package se.dinamic.nethack;
 import android.content.res.Resources;
 import android.util.Log;
 import javax.microedition.khronos.opengles.GL10;
-
+import java.lang.Math;
 
 /** Rendering in two phases, first an intro animation, then static showing progressbar.. */
 public class NetHackIntroRenderer implements NetHackRenderer {
@@ -53,6 +53,9 @@ public class NetHackIntroRenderer implements NetHackRenderer {
 		_shieldTexture.finalize(gl);
 	}
 	
+	public void clock(long time) {
+		_rotation+=0.05;
+	}
 	
 	private static float _rotation=0;
 	
@@ -60,14 +63,40 @@ public class NetHackIntroRenderer implements NetHackRenderer {
 		if( _startTime == 0 ) _startTime = java.lang.System.nanoTime();
 		gl.glPushMatrix();
 		gl.glTranslatef(0,0,-1);
-		_rotation+=1;
 		
 		// The shield...
 		//gl.glRotatef(_rotation,0,1,0);
 		_shieldTexture.render( gl );
 		
+		
 		if( _isIntroFinished ) {
 			// Render progressbar
+			// Store Original PROJECTION matrix before changing it
+			gl.glMatrixMode( gl.GL_PROJECTION );
+			gl.glPushMatrix();
+				gl.glDisable( gl.GL_LIGHTING );
+				gl.glDisable( gl.GL_DEPTH_TEST);
+				gl.glMatrixMode( gl.GL_MODELVIEW );
+					gl.glLoadIdentity();
+					float ratio=NetHackWindowManager.screenWidth/NetHackWindowManager.screenHeight;
+					gl.glOrthof(0, 1, 0, 1 / ratio, 0.0f, 10.0f);
+				
+					// Render progressbar background
+					gl.glScalef(1,0.05f,1);
+					gl.glTranslatef(0,2f,0);
+					NetHackObjects.renderColoredQuad(gl,1.0f,1.0f,0.95f,(float) (0.4f+ (0.075f * Math.sin(_rotation))) );
+			
+					// Render progress value
+					gl.glScalef( _progress*0.9f, 0.8f, 1.0f);
+					NetHackObjects.renderColoredQuad(gl,1.0f,1.0f,0.95f,0.9f);
+			
+					
+					
+				// Restore original PROJECTION matrix
+				gl.glMatrixMode( gl.GL_PROJECTION );
+			gl.glPopMatrix();
+			gl.glMatrixMode( gl.GL_MODELVIEW );
+			
 		} else {
 			// INTRO_LENGTH_MS secs has elapsed
 			//if( (java.lang.System.nanoTime() -  _startTime) > INTRO_LENGTH_MS ) 
