@@ -81,7 +81,8 @@ public class NetHackUserInterfaceRenderer implements NetHackRenderer {
 	public void preInit() {}
 	
 	public void init(GL10 gl) { }
-	
+	public void clock(long time) {}
+		
 	public void render(GL10 gl) {
 		if( ! _isTextureInitialized ) {
 			Log.d(NetHack.LOGTAG,"NetHackUserInterfaceRenderer.render() Finalizes the internal textures...");

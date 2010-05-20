@@ -220,8 +220,14 @@ public class NetHackWindowManager implements NetHackRenderer {
 		NetHackTextWindow.initialize(_resources);
 	}
 	
-	public void init(GL10 gl) {
-		
+	public void init(GL10 gl) { }
+	public void clock(long time) { 
+		// Run thru all window and clock them...
+		_collectionLock.lock();
+		for( int i=0;i<_windowRenderOrder.size();i++) {
+			_windowRenderOrder.get(i).window.clock( time );
+		}
+		_collectionLock.unlock();	
 	}
 	
 	public void render(GL10 gl) {

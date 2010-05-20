@@ -91,6 +91,7 @@ public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 	
 	public void init(GL10 gl) {}
 	public void preInit() {}
+	public void clock(long time) {}
 	
 	public void render(GL10 gl) {
 		if( ! _isTextureInitialized ) {

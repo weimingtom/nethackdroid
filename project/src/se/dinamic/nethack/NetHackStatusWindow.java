@@ -109,6 +109,7 @@ public class NetHackStatusWindow implements NetHackWindow {
 	
 	public void init(GL10 gl) { }
 	public void preInit() {}
+	public void clock(long time) {}
 	
 	public FontAtlasTexture.String _rankAndLevel;
 		
