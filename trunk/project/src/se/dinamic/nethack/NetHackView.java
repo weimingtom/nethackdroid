@@ -126,13 +126,18 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
       }
   }
   
+  /** This is rendering clock thread, providing animation calulation ticks.. 
+	@todo In future this delta clock might be placed within render loop onDrawSurface()
+  */
   private static class RendererClockThread extends Thread {
 	NetHackIntroRenderer _introRenderer;
 	private Vector<NetHackRenderer> _renderers;
-	
+	private long _previous=0;
+	  
 	public RendererClockThread( NetHackIntroRenderer introRenderer, Vector<NetHackRenderer> renderers ) {
 		_renderers = renderers;
 		_introRenderer=introRenderer;
+		_previous = java.lang.System.currentTimeMillis();
         }
 	
 	public void run() {
@@ -142,12 +147,16 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
 			} catch(InterruptedException e) {
 			}
 			
-			long time=0;
-			_introRenderer.clock( time );
+			long now = java.lang.System.currentTimeMillis();
+			long delta = now-_previous;
+			_introRenderer.clock( delta );
+			
 			for(int i=0;i<_renderers.size();i++) {
 				NetHackRenderer r=(NetHackRenderer)_renderers.get(i);
-				r.clock( time );
+				r.clock( delta );
 			}
+			
+			_previous=now;
 		}
 	}
   }

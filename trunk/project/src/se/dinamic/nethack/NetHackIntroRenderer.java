@@ -25,13 +25,21 @@ import java.lang.Math;
 
 /** Rendering in two phases, first an intro animation, then static showing progressbar.. */
 public class NetHackIntroRenderer implements NetHackRenderer {
-	private final static long INTRO_LENGTH_MS = 2000;
+	
+	/** The time of whole intro defined in millis. */
+	private final static float INTRO_LENGTH=2000;
+	
+	/** Distance for shield to travel under the whole intro time */
+	private final static float SHIELD_TRANSLATION_DISTANCE_Z=20.0f;
+	
+	/** The progress value 0-1 of progressbar. */
+	private static float _progress = 0.0f;
+	
 	private Resources _resources;
 	private boolean _isIntroFinished = false;
-	private static float _progress = 0.0f;
-	private long _startTime=0;
-	
+	private long _elapsedTime=0;
 	private Texture _shieldTexture;
+	private float _shieldTranslationZ=0.0f;
 	
 	public NetHackIntroRenderer(Resources resources) {
 		_resources=resources;
@@ -47,22 +55,32 @@ public class NetHackIntroRenderer implements NetHackRenderer {
 	
 	public void preInit() {
 		_shieldTexture = Texture.fromResource(_resources,R.drawable.shield);
+		_shieldTranslationZ = -SHIELD_TRANSLATION_DISTANCE_Z;
 	}
 	
 	public void init(GL10 gl) {
 		_shieldTexture.finalize(gl);
 	}
 	
-	public void clock(long time) {
-		_rotation+=0.05;
+	public void clock(long delta) {
+		_elapsedTime += delta;
+		if( _elapsedTime >= INTRO_LENGTH )	// Intro has finished..
+			_isIntroFinished=true;
+		
+		if( !_isIntroFinished ) {
+			// Make calculation on time delta of animations movements
+			_shieldTranslationZ -= ( SHIELD_TRANSLATION_DISTANCE_Z / INTRO_LENGTH ) * delta;
+		}
+		
+		// Pulsate the progressbar one waveform for a second of time..
+		_rotation+=(java.lang.Math.PI / 1000.0f)*delta;
 	}
 	
 	private static float _rotation=0;
 	
 	public void render(GL10 gl) {
-		if( _startTime == 0 ) _startTime = java.lang.System.nanoTime();
 		gl.glPushMatrix();
-		gl.glTranslatef(0,0,-1);
+		gl.glTranslatef(0,0,-_shieldTranslationZ);
 		
 		// The shield...
 		//gl.glRotatef(_rotation,0,1,0);
@@ -89,19 +107,13 @@ public class NetHackIntroRenderer implements NetHackRenderer {
 					// Render progress value
 					gl.glScalef( _progress*0.9f, 0.8f, 1.0f);
 					NetHackObjects.renderColoredQuad(gl,1.0f,1.0f,0.95f,0.9f);
-			
-					
 					
 				// Restore original PROJECTION matrix
 				gl.glMatrixMode( gl.GL_PROJECTION );
 			gl.glPopMatrix();
 			gl.glMatrixMode( gl.GL_MODELVIEW );
 			
-		} else {
-			// INTRO_LENGTH_MS secs has elapsed
-			//if( (java.lang.System.nanoTime() -  _startTime) > INTRO_LENGTH_MS ) 
-				_isIntroFinished=true;
-		}
+		} 
 		
 		gl.glPopMatrix();
 	}
