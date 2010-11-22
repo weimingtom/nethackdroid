@@ -123,6 +123,7 @@ public class FontAtlasTexture {
 		gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, ATLAS_SIZE, ATLAS_SIZE, 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, _data);
 		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
 		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_NEAREST); 
+		// free up memory
 		_data=null;
 		System.gc();
 	}
@@ -214,8 +215,15 @@ public class FontAtlasTexture {
 			} catch (java.io.IOException e) {
 			}
 		
+			// free up memory
 			bm.recycle();
+			bm = null;
+			bmc = null;
+			System.gc();
 		}
+		
+		// Free memory
+		p = null;
 		Log.d(NetHack.LOGTAG,"FontAtlasTexture.intialize()  "+ _map.size() +" characters generated in atlas.");
 			
 	}
