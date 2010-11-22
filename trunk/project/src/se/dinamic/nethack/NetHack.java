@@ -35,7 +35,7 @@ public class NetHack extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
     super.onCreate(savedInstanceState);
-        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN ); 	    
     
