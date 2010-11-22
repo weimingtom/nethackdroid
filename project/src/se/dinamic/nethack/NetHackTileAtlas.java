@@ -66,13 +66,16 @@ public class NetHackTileAtlas {
 		
 			Bitmap bmp = BitmapFactory.decodeResource( resources, id );
 			Bitmap realbmp = bmp.copy(Config.ARGB_8888, false);
-		
+			bmp.recycle();
+			bmp=null;
+			System.gc();
+			
+			// get byte data for bitmap
 			getBitmapData(realbmp);
+			realbmp.recycle();
 			
 			// Store cached texture
 			Texture.storeCache(id, _bitmapdata);
-			bmp.recycle();
-			realbmp.recycle();
 		}
 		
 		Log.d(NetHack.LOGTAG,"NetHackTileAtlas.loadFromResource() finished.");
@@ -101,10 +104,10 @@ public class NetHackTileAtlas {
 		float ysize = (1.0f / ( ATLAS_HEIGHT / TILE_SIZE ) );
 		// Log.d( "TextureAtlas", "generateTextureCoords() index"+index+" rows: "+rows+" cols: "+cols +" "+xoffset+","+yoffset+" - "+(xoffset+xsize)+","+ (yoffset+ysize));
 		
-		textureCoords.put( 0, xoffset);			textureCoords.put( 1, yoffset + ysize ); 
+		textureCoords.put( 0, xoffset);				textureCoords.put( 1, yoffset + ysize ); 
 		textureCoords.put( 2, xoffset + xsize );		textureCoords.put( 3, yoffset + ysize ); 
 		textureCoords.put( 4, xoffset); 			textureCoords.put( 5, yoffset ); 
-		textureCoords.put( 6, xoffset + xsize ); 	textureCoords.put( 7, yoffset ); 
+		textureCoords.put( 6, xoffset + xsize ); 		textureCoords.put( 7, yoffset ); 
 		
 	}
 	
@@ -120,7 +123,8 @@ public class NetHackTileAtlas {
 	
 	public void getBitmapData(Bitmap bmp)
 	{
-		_bitmapdata = ByteBuffer.allocateDirect(bmp.getHeight() * bmp.getWidth() * 4);
+		//_bitmapdata = ByteBuffer.allocateDirect(bmp.getHeight() * bmp.getWidth() * 4);
+		_bitmapdata = ByteBuffer.allocate(bmp.getHeight() * bmp.getWidth() * 4);
 		_bitmapdata.order(ByteOrder.BIG_ENDIAN);
 		IntBuffer ib = _bitmapdata.asIntBuffer();
 		for (int y = bmp.getHeight() - 1; y > -1; y--)

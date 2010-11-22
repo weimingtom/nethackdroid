@@ -17,6 +17,7 @@
 */
 
 package se.dinamic.nethack;
+import android.app.Application;
 import android.content.res.Resources;
 import java.nio.FloatBuffer;
 import javax.microedition.khronos.opengles.GL10;
@@ -43,11 +44,12 @@ public class NetHackTextWindow implements NetHackWindow {
 	private FloatBuffer _planeTextureCoords;
 	
 	private  static Texture _paperBackground;
-	private  static Resources _resources;
+	private  static Application _application;
 	
-	public static void initialize(Resources resources) {
-		_resources = resources;
-		_paperBackground = Texture.fromResource(resources,R.drawable.paper);
+	public static void initialize(Application application) {
+		Resources res = application.getApplicationContext().getResources();
+		_paperBackground = Texture.fromResource(res,R.raw.paper);
+		res = null;
 	}
 	
 	

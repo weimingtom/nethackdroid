@@ -34,13 +34,12 @@ public class NetHack extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-	super.onCreate(savedInstanceState);
-	//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        
+    super.onCreate(savedInstanceState);
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN ); 	    
     
-        _nethack = new NetHackEngine( this );
+        _nethack = new NetHackEngine( this.getApplication() );
         setContentView( _nethack.getView() );
         
     }
@@ -48,6 +47,7 @@ public class NetHack extends Activity
     @Override
     public void onDestroy( )
     {
+        _nethack = null;
         super.onDestroy( );
     }
 

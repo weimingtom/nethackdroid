@@ -18,7 +18,6 @@
 
 package se.dinamic.nethack;
 
-import android.util.Log;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -26,8 +25,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Random;
 import javax.microedition.khronos.opengles.GL10;
-import android.content.res.Resources;
 import java.util.concurrent.locks.ReentrantLock;
+
+import android.app.Application;
+import android.content.res.Resources;
+import android.util.Log;
 
 public class NetHackWindowManager implements NetHackRenderer {
 	/** NetHack message window type... */
@@ -62,7 +64,7 @@ public class NetHackWindowManager implements NetHackRenderer {
 	private ArrayList<Window> _windowRenderOrder;
 	private LinkedHashMap<Integer,Window> _windows;
 	private java.util.Random _random;
-	private Resources _resources;
+	private Application _application;
 	private boolean _isFontInitialized=false;
 	private final ReentrantLock _modalLock = new ReentrantLock();
 	private final ReentrantLock _collectionLock = new ReentrantLock();
@@ -75,8 +77,8 @@ public class NetHackWindowManager implements NetHackRenderer {
 	private NetHackMapWindow _mapWindow;
 	
 	
-	public NetHackWindowManager (Resources resources) {
-		_resources=resources;
+	public NetHackWindowManager (Application application) {
+		_application=application;
 		_random = new java.util.Random();
 		_windows = new LinkedHashMap<Integer,Window>();
 		_windowRenderOrder = new ArrayList<Window>();
@@ -214,10 +216,10 @@ public class NetHackWindowManager implements NetHackRenderer {
 		Log.d(NetHack.LOGTAG,"NetHackWindowManager.preInit() Pre intialize window manager renderer.");
 		
 		// initialize tile atlas for map window
-		NetHackMapWindow.initialize(_resources);
+		NetHackMapWindow.initialize(_application);
 		
 		// Initialize text window static data
-		NetHackTextWindow.initialize(_resources);
+		NetHackTextWindow.initialize(_application);
 	}
 	
 	public void init(GL10 gl) { }

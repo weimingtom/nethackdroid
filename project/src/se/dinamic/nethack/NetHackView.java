@@ -21,7 +21,7 @@ package se.dinamic.nethack;
 import android.opengl.GLSurfaceView;
 import android.content.Context;
 import android.util.Log;
-import android.content.res.Resources;
+import android.app.Application;
 import android.graphics.Typeface;
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -32,7 +32,7 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
 {
   private GL10 _gl;
   private Vector _renderers;
-  private Context _context;
+  private Application _application;
   private int _viewState;
   
   private NetHackIntroRenderer _introRenderer;
@@ -42,9 +42,9 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
   public final static int STATE_GAME_RUN=2;
   
     
-  public NetHackView(Context context) {
-    super(context);
-    _context=context;
+  public NetHackView(Application application) {
+    super(application.getApplicationContext());
+    _application=application;
     _renderers=new Vector<NetHackRenderer>();
     _viewState=STATE_INITIALIZE_GAME;
     
@@ -59,11 +59,11 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
     // Initialize helper class for 3d obejct rendering..
     NetHackObjects.initialize();
         
-	  
+      
     // Create the intro renderer
-    _introRenderer = new NetHackIntroRenderer( _context.getResources() );
+    _introRenderer = new NetHackIntroRenderer( _application );
     _introRenderer.preInit( );
-	  
+      
     RendererClockThread job=new RendererClockThread(_introRenderer,_renderers);
     job.start();
       
@@ -84,7 +84,7 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
         {
             // Thread to initialize all renderers and timeconsuming loading assigned 
             // to the  this view etc.. during intro anim....
-            InitializeRenderersJob job=new InitializeRenderersJob(_context.getResources(), _introRenderer,_renderers);
+            InitializeRenderersJob job=new InitializeRenderersJob(_application, _introRenderer,_renderers);
             job.start();
         }break;
         
@@ -127,58 +127,55 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
   }
   
   /** This is rendering clock thread, providing animation calulation ticks.. 
-	@todo In future this delta clock might be placed within render loop onDrawSurface()
+    @todo In future this delta clock might be placed within render loop onDrawSurface()
   */
   private static class RendererClockThread extends Thread {
-	NetHackIntroRenderer _introRenderer;
-	private Vector<NetHackRenderer> _renderers;
-	private long _previous=0;
-	  
-	public RendererClockThread( NetHackIntroRenderer introRenderer, Vector<NetHackRenderer> renderers ) {
-		_renderers = renderers;
-		_introRenderer=introRenderer;
-		_previous = java.lang.System.currentTimeMillis();
+    NetHackIntroRenderer _introRenderer;
+    private Vector<NetHackRenderer> _renderers;
+    private long _previous=0;
+      
+    public RendererClockThread( NetHackIntroRenderer introRenderer, Vector<NetHackRenderer> renderers ) {
+        _renderers = renderers;
+        _introRenderer=introRenderer;
+        _previous = java.lang.System.currentTimeMillis();
         }
-	
-	public void run() {
-		while(true) {
-			try {
-				Thread.sleep(10);
-			} catch(InterruptedException e) {
-			}
-			
-			long now = java.lang.System.currentTimeMillis();
-			long delta = now-_previous;
-			_introRenderer.clock( delta );
-			
-			for(int i=0;i<_renderers.size();i++) {
-				NetHackRenderer r=(NetHackRenderer)_renderers.get(i);
-				r.clock( delta );
-			}
-			
-			_previous=now;
-		}
-	}
+    
+    public void run() {
+        while(true) {
+            try {
+                Thread.sleep(10);
+            } catch(InterruptedException e) {
+            }
+            
+            long now = java.lang.System.currentTimeMillis();
+            long delta = now-_previous;
+            _introRenderer.clock( delta );
+            
+            for(int i=0;i<_renderers.size();i++) {
+                NetHackRenderer r=(NetHackRenderer)_renderers.get(i);
+                r.clock( delta );
+            }
+            
+            _previous=now;
+        }
+    }
   }
-
-
-  
   
   private static class InitializeRenderersJob extends Thread {
       private Vector<NetHackRenderer> _renderers;
-      private Resources _resources;
+      private Application _application;
       NetHackIntroRenderer _introRenderer;
       private  GL10 _gl;
       
-      public InitializeRenderersJob( Resources resources,NetHackIntroRenderer introRenderer, Vector<NetHackRenderer> renderers ) {
-        _resources = resources;
+      public InitializeRenderersJob(Application application,NetHackIntroRenderer introRenderer, Vector<NetHackRenderer> renderers ) {
+        _application = application;
         _renderers = renderers;
         _introRenderer=introRenderer;
       }
       
       public void run() {
         // Load sound 
-	NetHackSound.initialize();
+        NetHackSound.initialize();
         NetHackIntroRenderer.progress(0.25f);
           
         // intialize the fontatlastexture 
@@ -186,14 +183,14 @@ class NetHackView extends GLSurfaceView implements GLSurfaceView.Renderer
         NetHackIntroRenderer.progress(0.25f);
           
         // Initialize userinterface renderer...
-        NetHackUserInterfaceRenderer.initialize( _resources );
+        NetHackUserInterfaceRenderer.initialize( _application );
         NetHackIntroRenderer.progress(0.25f);
         
         Log.d(NetHack.LOGTAG,"NetHackView.InitializeRenderersJob.run() Running pre-initialization of renderers job.");
         for(int i=0;i<_renderers.size();i++) {
             NetHackRenderer r=(NetHackRenderer)_renderers.get(i);
             r.preInit( );
-   	    NetHackIntroRenderer.progress(0.25f/_renderers.size());
+            NetHackIntroRenderer.progress(0.25f/_renderers.size());
         }
         
         // Everything is initialized at this point lets

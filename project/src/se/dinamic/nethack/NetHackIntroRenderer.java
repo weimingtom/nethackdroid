@@ -18,6 +18,7 @@
 
 package se.dinamic.nethack;
 
+import android.app.Application;
 import android.content.res.Resources;
 import android.util.Log;
 import javax.microedition.khronos.opengles.GL10;
@@ -35,14 +36,14 @@ public class NetHackIntroRenderer implements NetHackRenderer {
 	/** The progress value 0-1 of progressbar. */
 	private static float _progress = 0.0f;
 	
-	private Resources _resources;
+	private Application _application;
 	private boolean _isIntroFinished = false;
 	private long _elapsedTime=0;
 	private Texture _shieldTexture;
 	private float _shieldTranslationZ=0.0f;
 	
-	public NetHackIntroRenderer(Resources resources) {
-		_resources=resources;
+	public NetHackIntroRenderer(Application application) {
+		_application=application;
 	}
 	
 	public static void progress(float add) {
@@ -54,8 +55,10 @@ public class NetHackIntroRenderer implements NetHackRenderer {
 	}
 	
 	public void preInit() {
-		_shieldTexture = Texture.fromResource(_resources,R.drawable.shield);
+		Resources res = _application.getApplicationContext().getResources();
+		_shieldTexture = Texture.fromResource(res,R.raw.shield);
 		_shieldTranslationZ = -SHIELD_TRANSLATION_DISTANCE_Z;
+		res = null;
 	}
 	
 	public void init(GL10 gl) {
