@@ -252,12 +252,14 @@ public class Texture {
 		_textureRatio = (_width/_height);
 		_isFinalized=true;
 		_data=null;
+		System.gc();
 		// Free _data
 	}
 	
 	public static ByteBuffer argb2rgba(Bitmap bmp)
 	{
-		ByteBuffer bb = ByteBuffer.allocateDirect(bmp.getHeight() * bmp.getWidth() * 4);
+		//ByteBuffer bb = ByteBuffer.allocateDirect(bmp.getHeight() * bmp.getWidth() * 4);
+		ByteBuffer bb = ByteBuffer.allocate(bmp.getHeight() * bmp.getWidth() * 4);
 		bb.order(ByteOrder.BIG_ENDIAN);
 		IntBuffer ib = bb.asIntBuffer();
 		for (int y = bmp.getHeight() - 1; y > -1; y--)

@@ -27,6 +27,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
+import android.app.Application;
 import android.util.Log;
 import android.content.res.Resources;
 
@@ -73,9 +74,10 @@ public class NetHackMapWindow extends NetHackMap implements NetHackWindow {
 		NetHackSound.play("Wind",1.0f,true);
 	}
 	
-	public static void initialize(Resources resources) {
-		_atlas = NetHackTileAtlas.createFromResource(resources,R.drawable.absurd32);
-		
+	public static void initialize(Application application) {
+		Resources res = application.getApplicationContext().getResources();
+		_atlas = NetHackTileAtlas.createFromResource(res,R.raw.absurd32);
+		res = null;
 	}
 	
 	public void zoomIn() { _zoom+=1.0f; }

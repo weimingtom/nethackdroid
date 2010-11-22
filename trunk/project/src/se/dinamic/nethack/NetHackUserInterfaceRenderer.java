@@ -20,6 +20,7 @@ package se.dinamic.nethack;
 
 import java.nio.FloatBuffer;
 import android.util.Log;
+import android.app.Application;
 import android.content.res.Resources;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -71,11 +72,13 @@ public class NetHackUserInterfaceRenderer implements NetHackRenderer {
 	
 	private boolean _isTextureInitialized=false;
 	
-	public static void initialize(Resources resources) {
-		_stoneTexture = Texture.fromResource(resources,R.drawable.stone);
+	public static void initialize(Application application) {
+		Resources res = application.getApplicationContext().getResources();
+		_stoneTexture = Texture.fromResource(res,R.raw.stone);
 		_cornerVertices = FloatBuffer.wrap( CORNER_VERTICES, 0, CORNER_VERTICES.length  );
 		_vertexColors = FloatBuffer.wrap( VERTEX_COLORS, 0, VERTEX_COLORS.length  );
 		_topLeftCornerTextureCoords = FloatBuffer.wrap( TOP_LEFT_CORNER_TEXTURE_COORDS, 0, TOP_LEFT_CORNER_TEXTURE_COORDS.length );
+		res = null;
 	}
 	
 	public void preInit() {}

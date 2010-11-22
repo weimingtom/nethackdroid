@@ -22,6 +22,7 @@ import java.util.Random;
 import android.util.Log;
 import android.view.View;
 import android.view.KeyEvent;
+import android.app.Application;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -30,19 +31,19 @@ import android.opengl.GLSurfaceView;
 
 public class NetHackEngine extends LibNetHack implements View.OnKeyListener
 {
-    private Activity _context;
+    private Application _application;
     private KeyEventQueue _keyevent;
     private static NetHackView _view;
     private NetHackWindowManager _wm;
     private NetHackSound _sound;
 	
-    public NetHackEngine(Activity context) 
+    public NetHackEngine(Application application) 
    {
-	_context=context;
+	_application=application;
 	// Setup view
-	_sound = new NetHackSound( context );
-	_wm = new NetHackWindowManager(context.getResources());
-	_view = new NetHackView( context );
+	_sound = new NetHackSound( application );
+	_wm = new NetHackWindowManager( application );
+	_view = new NetHackView( application );
 	_keyevent = new KeyEventQueue();
          
 	
@@ -81,7 +82,7 @@ public class NetHackEngine extends LibNetHack implements View.OnKeyListener
     
     public void onRawPrint(String status) {
        // This should probable been overlayed on ui as a log...
-        Toast toast = Toast.makeText(_context, status, Toast.LENGTH_LONG);
+        Toast toast = Toast.makeText(_application, status, Toast.LENGTH_LONG);
         toast.show();
     }
     
