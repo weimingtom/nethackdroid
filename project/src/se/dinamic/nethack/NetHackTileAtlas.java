@@ -123,8 +123,7 @@ public class NetHackTileAtlas {
 	
 	public void getBitmapData(Bitmap bmp)
 	{
-		//_bitmapdata = ByteBuffer.allocateDirect(bmp.getHeight() * bmp.getWidth() * 4);
-		_bitmapdata = ByteBuffer.allocate(bmp.getHeight() * bmp.getWidth() * 4);
+		_bitmapdata = ByteBuffer.allocateDirect(bmp.getHeight() * bmp.getWidth() * 4);
 		_bitmapdata.order(ByteOrder.BIG_ENDIAN);
 		IntBuffer ib = _bitmapdata.asIntBuffer();
 		for (int y = bmp.getHeight() - 1; y > -1; y--)

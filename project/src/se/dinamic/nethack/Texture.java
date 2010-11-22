@@ -147,7 +147,7 @@ public class Texture {
 			try {
 				// Cached texture data exists let's load it
 				ReadableByteChannel channel = new FileInputStream( f ).getChannel();
-				data = ByteBuffer.allocate((int)f.length());
+				data = ByteBuffer.allocateDirect((int)f.length());
 				channel.read(data);
 				return data;
 			} catch ( FileNotFoundException e ) {
@@ -258,8 +258,7 @@ public class Texture {
 	
 	public static ByteBuffer argb2rgba(Bitmap bmp)
 	{
-		//ByteBuffer bb = ByteBuffer.allocateDirect(bmp.getHeight() * bmp.getWidth() * 4);
-		ByteBuffer bb = ByteBuffer.allocate(bmp.getHeight() * bmp.getWidth() * 4);
+		ByteBuffer bb = ByteBuffer.allocateDirect(bmp.getHeight() * bmp.getWidth() * 4);
 		bb.order(ByteOrder.BIG_ENDIAN);
 		IntBuffer ib = bb.asIntBuffer();
 		for (int y = bmp.getHeight() - 1; y > -1; y--)
